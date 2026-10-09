@@ -3,12 +3,12 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Pytest / Cache
+# Pytest / Coverage / Cache
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Environments
+# Python Environments
 .venv/
 env/
 venv/
@@ -18,6 +18,28 @@ ENV/
 *.db
 backend/satshield.db
 
-# IDEs
-.vscode/
-.idea/
+# Node / Frontend
+node_modules
+dist
+dist-ssr
+*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
