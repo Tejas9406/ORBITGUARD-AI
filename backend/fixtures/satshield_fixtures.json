@@ -1,0 +1,266 @@
+{
+  "channels": [
+    {
+      "id": 1,
+      "channel_key": "S-1",
+      "source": "NASA SMAP",
+      "units": "Normalized (-1 to 1)",
+      "subsystem": "Unknown / Unspecified",
+      "anomaly_type": ", p, o, i, n, t,"
+    },
+    {
+      "id": 2,
+      "channel_key": "E-2",
+      "source": "NASA SMAP",
+      "units": "Normalized (-1 to 1)",
+      "subsystem": "Unknown / Unspecified",
+      "anomaly_type": ", p, o, i, n, t,"
+    },
+    {
+      "id": 3,
+      "channel_key": "P-1",
+      "source": "NASA SMAP",
+      "units": "Normalized (-1 to 1)",
+      "subsystem": "Unknown / Unspecified",
+      "anomaly_type": ", c, o, n, t, e, x, t, u, a, l, ,,  , c, o, n, t, e, x, t, u, a, l, ,,  , c, o, n, t, e, x, t, u, a, l,"
+    },
+    {
+      "id": 4,
+      "channel_key": "E-1",
+      "source": "NASA SMAP",
+      "units": "Normalized (-1 to 1)",
+      "subsystem": "Unknown / Unspecified",
+      "anomaly_type": ", c, o, n, t, e, x, t, u, a, l, ,,  , c, o, n, t, e, x, t, u, a, l,"
+    },
+    {
+      "id": 5,
+      "channel_key": "T-1",
+      "source": "NASA SMAP",
+      "units": "Normalized (-1 to 1)",
+      "subsystem": "Unknown / Unspecified",
+      "anomaly_type": ", p, o, i, n, t, ,,  , c, o, n, t, e, x, t, u, a, l,"
+    },
+    {
+      "id": 6,
+      "channel_key": "C-1",
+      "source": "NASA MSL",
+      "units": "Normalized (-1 to 1)",
+      "subsystem": "Unknown / Unspecified",
+      "anomaly_type": ", p, o, i, n, t, ,,  , c, o, n, t, e, x, t, u, a, l,"
+    },
+    {
+      "id": 7,
+      "channel_key": "C-2",
+      "source": "NASA MSL",
+      "units": "Normalized (-1 to 1)",
+      "subsystem": "Unknown / Unspecified",
+      "anomaly_type": ", p, o, i, n, t, ,,  , c, o, n, t, e, x, t, u, a, l,"
+    },
+    {
+      "id": 8,
+      "channel_key": "PWR.BATT_TEMP",
+      "source": "DEMO (Synthetic Simulation)",
+      "units": "\u00b0C",
+      "subsystem": "Simulated Battery Bus",
+      "anomaly_type": "Injected Thermal Spike"
+    }
+  ],
+  "benchmarks": [
+    {
+      "channel": "S-1",
+      "method": "Z-score",
+      "precision": 0.152,
+      "recall": 1.0,
+      "f1": 0.264
+    },
+    {
+      "channel": "S-1",
+      "method": "Isolation Forest",
+      "precision": 0.014,
+      "recall": 1.0,
+      "f1": 0.028
+    },
+    {
+      "channel": "E-2",
+      "method": "Z-score",
+      "precision": 0.152,
+      "recall": 1.0,
+      "f1": 0.263
+    },
+    {
+      "channel": "E-2",
+      "method": "Isolation Forest",
+      "precision": 0.007,
+      "recall": 1.0,
+      "f1": 0.014
+    },
+    {
+      "channel": "P-1",
+      "method": "Z-score",
+      "precision": 0.214,
+      "recall": 1.0,
+      "f1": 0.352
+    },
+    {
+      "channel": "P-1",
+      "method": "Isolation Forest",
+      "precision": 0.085,
+      "recall": 1.0,
+      "f1": 0.157
+    },
+    {
+      "channel": "E-1",
+      "method": "Z-score",
+      "precision": 0.068,
+      "recall": 1.0,
+      "f1": 0.127
+    },
+    {
+      "channel": "E-1",
+      "method": "Isolation Forest",
+      "precision": 0.026,
+      "recall": 1.0,
+      "f1": 0.052
+    },
+    {
+      "channel": "T-1",
+      "method": "Z-score",
+      "precision": 0.181,
+      "recall": 0.5,
+      "f1": 0.265
+    },
+    {
+      "channel": "T-1",
+      "method": "Isolation Forest",
+      "precision": 0.179,
+      "recall": 1.0,
+      "f1": 0.304
+    },
+    {
+      "channel": "C-1",
+      "method": "Z-score",
+      "precision": 0.148,
+      "recall": 1.0,
+      "f1": 0.257
+    },
+    {
+      "channel": "C-1",
+      "method": "Isolation Forest",
+      "precision": 0.167,
+      "recall": 1.0,
+      "f1": 0.286
+    },
+    {
+      "channel": "C-2",
+      "method": "Z-score",
+      "precision": 0.059,
+      "recall": 0.5,
+      "f1": 0.105
+    },
+    {
+      "channel": "C-2",
+      "method": "Isolation Forest",
+      "precision": 0.106,
+      "recall": 1.0,
+      "f1": 0.192
+    },
+    {
+      "channel": "S-1",
+      "method": "LSTM",
+      "precision": 0.034,
+      "recall": 1.0,
+      "f1": 0.066
+    },
+    {
+      "channel": "E-2",
+      "method": "LSTM",
+      "precision": 0.033,
+      "recall": 1.0,
+      "f1": 0.063
+    },
+    {
+      "channel": "P-1",
+      "method": "LSTM",
+      "precision": 0.1,
+      "recall": 1.0,
+      "f1": 0.183
+    },
+    {
+      "channel": "E-1",
+      "method": "LSTM",
+      "precision": 0.056,
+      "recall": 1.0,
+      "f1": 0.107
+    },
+    {
+      "channel": "T-1",
+      "method": "LSTM",
+      "precision": 0.014,
+      "recall": 0.5,
+      "f1": 0.027
+    },
+    {
+      "channel": "C-1",
+      "method": "LSTM",
+      "precision": 0.318,
+      "recall": 0.5,
+      "f1": 0.389
+    },
+    {
+      "channel": "C-2",
+      "method": "LSTM",
+      "precision": 0.083,
+      "recall": 0.5,
+      "f1": 0.143
+    },
+    {
+      "channel": "S-1",
+      "method": "Autoencoder",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    {
+      "channel": "E-2",
+      "method": "Autoencoder",
+      "precision": 0.77,
+      "recall": 1.0,
+      "f1": 0.87
+    },
+    {
+      "channel": "P-1",
+      "method": "Autoencoder",
+      "precision": 0.036,
+      "recall": 0.333,
+      "f1": 0.065
+    },
+    {
+      "channel": "E-1",
+      "method": "Autoencoder",
+      "precision": 0.014,
+      "recall": 0.5,
+      "f1": 0.028
+    },
+    {
+      "channel": "T-1",
+      "method": "Autoencoder",
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0
+    },
+    {
+      "channel": "C-1",
+      "method": "Autoencoder",
+      "precision": 1.0,
+      "recall": 0.5,
+      "f1": 0.667
+    },
+    {
+      "channel": "C-2",
+      "method": "Autoencoder",
+      "precision": 0.919,
+      "recall": 0.5,
+      "f1": 0.648
+    }
+  ]
+}
