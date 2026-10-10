@@ -79,6 +79,16 @@ populate_datasets()
 async def lifespan(app: FastAPI):
     try:
         init_db()
+        from backend.db import SessionLocal
+        from backend.models import Channel
+        db = SessionLocal()
+        try:
+            if db.query(Channel).count() == 0:
+                print("Fresh database detected on boot. Auto-seeding initial datasets and channels...")
+                from backend.ingest import ingest_all
+                ingest_all()
+        finally:
+            db.close()
     except Exception as e:
         print(f"Database init warning: {e}")
     yield
@@ -802,4 +812,5 @@ def get_fleet_metrics(db: Session = Depends(get_db)):
     }
 
 if __name__ == "__main__":
-    uvicorn.run("backend.api:app", host="0.0.0.0", port=8000, reload=False)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("backend.api:app", host="0.0.0.0", port=port, reload=False)
