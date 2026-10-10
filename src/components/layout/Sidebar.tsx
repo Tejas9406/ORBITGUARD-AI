@@ -32,7 +32,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const navItems = [
     { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
     { name: 'Telemetry Explorer', to: '/telemetry', icon: Activity },
-    { name: 'Anomalies', to: '/anomalies', icon: AlertOctagon, badge: '2 ACTIVE' },
+    { name: 'Custom Upload', to: '/upload', icon: Database },
+    { name: 'Anomalies', to: '/anomalies', icon: AlertOctagon },
     { name: 'Subsystem Health', to: '/health', icon: HeartPulse },
     { name: 'Telemetry Replay', to: '/replay', icon: PlayCircle },
     { name: 'Mission History', to: '/history', icon: History },
@@ -64,10 +65,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex flex-col truncate">
                 <span className="font-mono font-bold text-base tracking-wider text-slate-100 flex items-center gap-1.5">
-                  SAT<span className="text-cyan-400">SHIELD</span>
+                  ORBIT<span className="text-cyan-400">GUARD</span>
                 </span>
                 <span className="text-[10px] tracking-tight text-slate-400 truncate">
-                  ISRO SPACE-03 ENGINE
+                  GENERIC TELEMETRY PLATFORM
                 </span>
               </div>
             )}
@@ -109,11 +110,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <Icon className={`w-4 h-4 shrink-0`} />
                 {!isCollapsed && <span className="truncate flex-1">{item.name}</span>}
-                {!isCollapsed && item.badge && (
-                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-rose-950/80 text-rose-400 border border-rose-500/50 font-bold shrink-0">
-                    {item.badge}
-                  </span>
-                )}
               </NavLink>
             );
           })}
@@ -129,34 +125,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Radio className="w-3.5 h-3.5 text-cyan-400" />
                     Stream:
                   </span>
-                  <span className="text-emerald-400 font-medium">ONLINE (1Hz)</span>
+                  <span className="text-slate-300 font-medium">SOURCE-DEPENDENT</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-400">
                   <span className="flex items-center gap-1.5">
                     <Server className="w-3.5 h-3.5 text-cyan-400" />
                     AI Engine:
                   </span>
-                  <span className="text-cyan-400 font-medium">ISRO-SPACE03</span>
+                  <span className="text-cyan-400 font-medium">ORBITGUARD CORE</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-400">
                   <span className="flex items-center gap-1.5">
                     <Database className="w-3.5 h-3.5 text-cyan-400" />
                     Backend API:
                   </span>
-                  <span className="text-amber-400 font-medium">FASTAPI READY</span>
+                  <span className="text-amber-400 font-medium">CHECK /api/health</span>
                 </div>
               </div>
 
               <div className="pt-2 border-t border-[#1E2D4A]/60 flex items-center justify-between text-[10px] font-mono text-slate-400">
-                <span>Pass: #0924 (LEO)</span>
-                <span className="text-slate-400">10:54 UTC</span>
+                <span>Analysis state is run-scoped</span>
               </div>
             </>
           ) : (
             <div className="flex flex-col items-center gap-2 py-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" title="Telemetry Online" />
-              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" title="AI Engine Active" />
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" title="FastAPI Ready (Demo Data)" />
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-400" title="State shown in page" />
             </div>
           )}
         </div>

@@ -1,0 +1,27 @@
+{
+  "model_id": "ESA_LSTM_CADC0872",
+  "detector_type": "Pretrained LSTM",
+  "architecture": "NumPy Autoregressive RNN/LSTM (L=20, H=16)",
+  "version": "1.0.0",
+  "training_source": "ESA_OPS_SAT_AD",
+  "expected_feature_dim": 1,
+  "expected_feature_names": [
+    "OPS_SAT_CADC0872"
+  ],
+  "expected_units": [
+    "rad/s"
+  ],
+  "lookback_window": 20,
+  "prediction_steps": 1,
+  "preprocessing_version": "esa_standard_causal_v1",
+  "artifact_path": "models\\esa_lstm_CADC0872.npz",
+  "artifact_checksum_sha256": "2f3d58a0580123d338635e5be61c4e6ba68d291985e357c28651789a3d82cb08",
+  "calibration_method": "validation_split_std",
+  "threshold_value": 3.0,
+  "status": "PRODUCTION_READY",
+  "metadata": {
+    "train_mean": 2.847496363300215e-07,
+    "train_std": 2.1783231401639337e-05,
+    "channel_id": "CADC0872"
+  }
+}

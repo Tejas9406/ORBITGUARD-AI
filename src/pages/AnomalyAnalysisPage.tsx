@@ -47,9 +47,8 @@ export const AnomalyAnalysisPage: React.FC = () => {
     return <LoadingState message="Fetching Anomaly Records..." submessage="Analyzing detection evidence from machine learning pipeline" />;
   }
 
-  if (error || !selectedAnomaly) {
-    return <ErrorState message={error || 'No anomaly records found'} onRetry={reload} />;
-  }
+  if (error) return <ErrorState message={error} onRetry={reload} />;
+  if (!selectedAnomaly) return <div className="sat-panel p-6"><h2 className="font-mono font-bold">No consensus events in the current run</h2><p className="mt-2 text-sm text-slate-400">Run analysis from Telemetry Explorer to produce event evidence. A run with zero events is valid and is not shown as an error.</p><button onClick={() => navigate('/telemetry')} className="mt-4 rounded bg-cyan-600 px-3 py-2 text-xs font-mono font-bold text-white">OPEN TELEMETRY EXPLORER</button></div>;
 
   // Derive target subsystem route
   const subsystemRouteId = selectedAnomaly.subsystem.toLowerCase().includes('power')
@@ -183,28 +182,28 @@ export const AnomalyAnalysisPage: React.FC = () => {
               <div className="p-2.5 rounded bg-[#070D1B] border border-[#16294A]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Observed Telemetry</span>
                 <span className="text-lg font-mono font-bold text-rose-400">
-                  {selectedAnomaly.observedValue} <span className="text-xs">{selectedAnomaly.unit}</span>
+                  {Number.isNaN(selectedAnomaly.observedValue) || selectedAnomaly.observedValue === 0 ? "N/A" : selectedAnomaly.observedValue} <span className="text-xs">{selectedAnomaly.unit}</span>
                 </span>
               </div>
 
               <div className="p-2.5 rounded bg-[#070D1B] border border-[#16294A]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Expected Baseline</span>
                 <span className="text-lg font-mono font-bold text-slate-200">
-                  {selectedAnomaly.expectedValue} <span className="text-xs">{selectedAnomaly.unit}</span>
+                  {Number.isNaN(selectedAnomaly.expectedValue) ? "Multiple" : selectedAnomaly.expectedValue} <span className="text-xs font-normal text-slate-400">algorithms</span>
                 </span>
               </div>
 
               <div className="p-2.5 rounded bg-[#070D1B] border border-[#16294A]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Safety Limit</span>
                 <span className="text-lg font-mono font-bold text-amber-400">
-                  {selectedAnomaly.thresholdValue} <span className="text-xs">{selectedAnomaly.unit}</span>
+                  {Number.isNaN(selectedAnomaly.thresholdValue) ? "Consensus" : selectedAnomaly.thresholdValue} <span className="text-xs font-normal text-slate-400">derived</span>
                 </span>
               </div>
 
               <div className="p-2.5 rounded bg-[#070D1B] border border-[#16294A]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">ML Anomaly Score</span>
                 <span className="text-lg font-mono font-bold text-cyan-300">
-                  {selectedAnomaly.anomalyScore} <span className="text-xs font-normal text-slate-400">/ 1.0</span>
+                  {selectedAnomaly.anomalyScore.toFixed(4)} <span className="text-xs font-normal text-slate-400">peak</span>
                 </span>
               </div>
             </div>
@@ -338,3 +337,5 @@ export const AnomalyAnalysisPage: React.FC = () => {
     </div>
   );
 };
+
+

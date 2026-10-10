@@ -1,0 +1,74 @@
+{
+  "run_id": "run_20261010_011341_1111",
+  "timestamp": "2026-10-10 01:14:19",
+  "total_channels_evaluated": 80,
+  "total_evaluations": 240,
+  "total_elapsed_seconds": 38.46,
+  "detector_summary": {
+    "Isolation Forest": {
+      "channels_evaluated": 80,
+      "macro_precision": 0.1666,
+      "macro_recall": 0.2292,
+      "macro_f1": 0.1794,
+      "micro_precision": 0.115,
+      "micro_recall": 0.2233,
+      "micro_f1": 0.1518,
+      "total_true_positives": 23,
+      "total_false_positives": 177,
+      "total_false_negatives": 80,
+      "total_ground_truth_events": 103,
+      "total_detected_events": 213,
+      "mean_execution_time_seconds": 0.462
+    },
+    "Pretrained LSTM": {
+      "channels_evaluated": 80,
+      "macro_precision": 0.2155,
+      "macro_recall": 0.9375,
+      "macro_f1": 0.2779,
+      "micro_precision": 0.0422,
+      "micro_recall": 0.9223,
+      "micro_f1": 0.0807,
+      "total_true_positives": 95,
+      "total_false_positives": 2157,
+      "total_false_negatives": 8,
+      "total_ground_truth_events": 103,
+      "total_detected_events": 2369,
+      "mean_execution_time_seconds": 0.003
+    },
+    "Statistical Baseline": {
+      "channels_evaluated": 80,
+      "macro_precision": 0.3371,
+      "macro_recall": 0.8521,
+      "macro_f1": 0.4002,
+      "micro_precision": 0.0329,
+      "micro_recall": 0.835,
+      "micro_f1": 0.0633,
+      "total_true_positives": 86,
+      "total_false_positives": 2529,
+      "total_false_negatives": 17,
+      "total_ground_truth_events": 103,
+      "total_detected_events": 2944,
+      "mean_execution_time_seconds": 0.007
+    }
+  },
+  "audit": {
+    "raw_channel_count": 82,
+    "label_row_count": 82,
+    "unambiguous_labelled_channel_count": 80,
+    "feature_widths": {
+      "25": 54,
+      "55": 28
+    },
+    "duplicate_label_channels": {
+      "P-2": 2
+    },
+    "conflicting_label_channels": [
+      "P-2"
+    ],
+    "unlabelled_raw_channels": [
+      "T-10"
+    ],
+    "labelled_channels_missing_raw_data": [],
+    "shape_mismatches": []
+  }
+}

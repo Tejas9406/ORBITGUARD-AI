@@ -1,0 +1,7 @@
+channel_id,parameter,unit,detector_name,execution_status,status_reason,total_observations,ground_truth_events,detected_events,true_positives,false_positives,false_negatives,precision,recall,f1_score,execution_time_seconds
+CADC0872,Gyro Angular Velocity X,rad/s,Statistical Baseline,EXECUTED,Operational,3000,10,0,0,0,10,0.0,0.0,0.0,0.046
+CADC0872,Gyro Angular Velocity X,rad/s,Isolation Forest,EXECUTED,Operational,3000,10,9,5,4,6,0.5556,0.4,0.4651,0.8497
+CADC0872,Gyro Angular Velocity X,rad/s,Sequence LSTM,EXECUTED,Operational (Trained on ESA OPS-SAT),3000,10,1,1,0,0,1.0,1.0,1.0,0.0052
+CADC0892,Fine Sun Sensor Elevation,rad,Statistical Baseline,EXECUTED,Operational,3000,3,5,2,3,1,0.4,0.6667,0.5,0.0328
+CADC0892,Fine Sun Sensor Elevation,rad,Isolation Forest,EXECUTED,Operational,3000,3,0,0,0,3,0.0,0.0,0.0,0.6655
+CADC0892,Fine Sun Sensor Elevation,rad,Sequence LSTM,EXECUTED,Operational (Trained on ESA OPS-SAT),3000,3,0,0,0,3,0.0,0.0,0.0,0.0035

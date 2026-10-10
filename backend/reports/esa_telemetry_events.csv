@@ -1,0 +1,17 @@
+channel_id,detector_name,start_step,end_step,duration,flagged_points,peak_score,severity
+CADC0872,Isolation Forest,25,29,5,5,4.6503,medium
+CADC0872,Isolation Forest,1289,1293,5,5,3.942,medium
+CADC0872,Isolation Forest,1809,1811,3,3,4.3664,medium
+CADC0872,Isolation Forest,1893,1898,6,6,4.4941,medium
+CADC0872,Isolation Forest,2190,2192,3,3,3.97,medium
+CADC0872,Isolation Forest,2384,2386,3,3,4.3664,medium
+CADC0872,Isolation Forest,2452,2459,8,8,4.376,medium
+CADC0872,Isolation Forest,2527,2534,8,8,4.3953,medium
+CADC0872,Isolation Forest,2779,2781,3,3,4.4747,medium
+CADC0872,Sequence LSTM,20,2999,2980,2980,50.0,critical
+CADC0872,Consensus (Multi-Detector),20,2999,2980,2980,50.0,critical
+CADC0892,Statistical Baseline,1094,1115,22,22,23.9386,critical
+CADC0892,Statistical Baseline,1772,1777,6,6,15.372,critical
+CADC0892,Statistical Baseline,1978,1997,20,20,18.1568,critical
+CADC0892,Statistical Baseline,2337,2386,50,50,50.0,critical
+CADC0892,Statistical Baseline,2929,2983,55,50,50.0,critical

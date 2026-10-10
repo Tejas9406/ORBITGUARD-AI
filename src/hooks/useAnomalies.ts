@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/api';
-import { DEMO_ANOMALIES } from '../data/demoAnomalies';
 import type { AnomalyEvent, AnomalySeverity, AnomalyStatus } from '../types/anomaly';
 
 export function useAnomalies(initialAnomalyId?: string) {
-  const [anomalies, setAnomalies] = useState<AnomalyEvent[]>(DEMO_ANOMALIES);
-  const [selectedAnomalyId, setSelectedAnomalyId] = useState<string>(initialAnomalyId || 'ANM-0047');
+  const [anomalies, setAnomalies] = useState<AnomalyEvent[]>([]);
+  const [selectedAnomalyId, setSelectedAnomalyId] = useState<string>(initialAnomalyId || '');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
