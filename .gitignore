@@ -1,38 +1,30 @@
-# ==============================
-# Node / Frontend (Vite)
-# ==============================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / Coverage / Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Python Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Local databases (large binaries)
+*.db
+backend/satshield.db
+
+# Node / Frontend
 node_modules/
 dist/
 dist-ssr/
 *.local
 
-# ==============================
-# Python environments / bytecode
-# ==============================
-.venv/
-env/
-venv/
-ENV/
-__pycache__/
-*.py[cod]
-*$py.class
-
-# ==============================
-# Python testing / coverage
-# ==============================
-.pytest_cache/
-.coverage
-htmlcov/
-
-# ==============================
-# Local databases & artifacts
-# ==============================
-*.db
-backend/satshield.db
-
-# ==============================
 # Logs
-# ==============================
 logs/
 *.log
 npm-debug.log*
@@ -41,9 +33,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# ==============================
-# Editors & OS artifacts
-# ==============================
+# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea/
@@ -54,3 +44,4 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
