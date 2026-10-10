@@ -66,9 +66,9 @@ export const tokens = {
   },
 
   typography: {
-    fontSans: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontSans: '"Kineks", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontMono: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
-    fontDisplay: '"Space Grotesk", "Inter", sans-serif',
+    fontDisplay: '"Nevera", "Kineks", sans-serif',
   },
 
   radii: {

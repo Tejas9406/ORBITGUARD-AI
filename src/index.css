@@ -1,5 +1,61 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Nevera';
+  src: url('./assets/fonts/nevera/Nevera-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kineks';
+  src: url('./assets/fonts/kineks/KineksCompactTrial-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kineks';
+  src: url('./assets/fonts/kineks/KineksCompactTrial-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kineks';
+  src: url('./assets/fonts/kineks/KineksCompactTrial-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kineks';
+  src: url('./assets/fonts/kineks/KineksCompactTrial-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kineks';
+  src: url('./assets/fonts/kineks/KineksCompactTrial-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Kineks';
+  src: url('./assets/fonts/kineks/KineksCompactTrial-Oblique.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --bg-main: #050811;
@@ -12,12 +68,23 @@
     --accent-cyan: #00E5FF;
     --text-primary: #F8FAFC;
     --text-secondary: #94A3B8;
+    --font-display: 'Nevera', sans-serif;
+    --font-body: 'Kineks', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
   body {
     background-color: #050811;
     color: #F8FAFC;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, .font-display, .sat-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.03em;
+  }
+
+  input, button, select, textarea {
+    font-family: var(--font-body);
   }
 
   /* Aerospace mission control technical scrollbars */

@@ -16,6 +16,7 @@ import {
   HelpCircle,
   ShieldCheck,
   Zap,
+  Cpu,
 } from 'lucide-react';
 
 export const AnomalyAnalysisPage: React.FC = () => {
@@ -272,6 +273,14 @@ export const AnomalyAnalysisPage: React.FC = () => {
               >
                 <Zap className="w-3.5 h-3.5" />
                 <span>VIEW SUBSYSTEM HEALTH ({selectedAnomaly.subsystem})</span>
+              </button>
+
+              <button
+                onClick={() => navigate('/spacecraft')}
+                className="py-1.5 px-3 rounded bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 text-xs font-mono font-bold border border-cyan-400/50 flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Cpu className="w-3.5 h-3.5 text-cyan-400" />
+                <span>INSPECT IN 3D SPACECRAFT TWIN</span>
               </button>
             </div>
           </GlassPanel>

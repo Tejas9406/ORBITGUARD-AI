@@ -34,7 +34,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
         {Icon && <Icon className="w-4 h-4 text-cyan-400" />}
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-mono text-xs md:text-sm font-semibold tracking-wider text-slate-100 uppercase">
+            <h3 className="font-display text-sm md:text-base font-semibold tracking-wider text-slate-100 uppercase">
               {title}
             </h3>
             {badge && (
