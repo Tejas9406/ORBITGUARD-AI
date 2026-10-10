@@ -1,31 +1,39 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# ==============================
+# Node / Frontend (Vite)
+# ==============================
+node_modules/
+dist/
+dist-ssr/
+*.local
 
-# Pytest / Coverage / Cache
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Python Environments
+# ==============================
+# Python environments / bytecode
+# ==============================
 .venv/
 env/
 venv/
 ENV/
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Local databases (large binaries)
+# ==============================
+# Python testing / coverage
+# ==============================
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ==============================
+# Local databases & artifacts
+# ==============================
 *.db
 backend/satshield.db
 
-# Node / Frontend
-node_modules
-dist
-dist-ssr
-*.local
-
+# ==============================
 # Logs
-logs
+# ==============================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -33,11 +41,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Editor directories and files
+# ==============================
+# Editors & OS artifacts
+# ==============================
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
