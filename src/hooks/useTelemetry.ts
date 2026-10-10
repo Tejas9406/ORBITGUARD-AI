@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiService } from '../services/api';
-import { DEMO_CHANNELS, generateDemoTelemetrySeries } from '../data/demoTelemetry';
 import type { TelemetryChannel, TelemetryPoint, TelemetryStreamFilter } from '../types/telemetry';
 
-export function useTelemetry(initialChannelId: string = 'Channel_04') {
-  const [channels, setChannels] = useState<TelemetryChannel[]>(DEMO_CHANNELS);
+export function useTelemetry(initialChannelId: string = '') {
+  const [channels, setChannels] = useState<TelemetryChannel[]>([]);
   const [selectedChannelId, setSelectedChannelId] = useState<string>(initialChannelId);
-  const [series, setSeries] = useState<TelemetryPoint[]>(() => generateDemoTelemetrySeries(initialChannelId));
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [series, setSeries] = useState<TelemetryPoint[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<TelemetryStreamFilter>({
     channelId: initialChannelId,
@@ -20,13 +19,17 @@ export function useTelemetry(initialChannelId: string = 'Channel_04') {
   const loadData = useCallback((chanId: string) => {
     let isCancelled = false;
     setIsLoading(true);
-    Promise.all([
-      apiService.getChannels(),
-      apiService.getTelemetrySeries(chanId),
-    ]).then(([chList, serList]) => {
+    apiService.getChannels().then(async (chList) => {
+      const active = chanId || chList[0]?.id;
+      if (!active) throw new Error('The selected dataset contains no channels.');
+      const serList = await apiService.getTelemetrySeries(active);
       if (!isCancelled) {
-        setChannels(chList);
+        const values = serList.map((p) => p.value);
+        const mean = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+        const stdDev = values.length ? Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length) : 0;
+        setChannels(chList.map((item) => item.id === active ? { ...item, currentValue: values.at(-1) ?? NaN, baselineValue: mean, mean, stdDev, min: values.length ? Math.min(...values) : 0, max: values.length ? Math.max(...values) : 0 } : item));
         setSeries(serList);
+        setSelectedChannelId(prev => prev || active);
       }
     }).catch((err: unknown) => {
       if (!isCancelled) setError(err instanceof Error ? err.message : 'Failed to load telemetry stream');
@@ -34,7 +37,7 @@ export function useTelemetry(initialChannelId: string = 'Channel_04') {
       if (!isCancelled) setIsLoading(false);
     });
     return () => { isCancelled = true; };
-  }, []);
+  }, []); // no dependency on selectedChannelId
 
   useEffect(() => {
     const cancel = loadData(selectedChannelId);

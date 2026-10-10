@@ -1,0 +1,5 @@
+scenario,channel_id,observations,validation_status,gt_events,statistical_events,iso_forest_events,consensus_events,notes,statistical_recall,iso_recall
+LEO Solar Array Bus Voltage (Nominal),SIM_LEO_NOMINAL,1200,COMPATIBLE,0,0,0,0,Nominal sinusoidal day-night cycle with zero anomalies.,,
+EPS Battery Undervoltage Sag during Eclipse,SIM_SAT_02_EPS,1500,COMPATIBLE,1,5,5,7,Simulated battery cell droop in eclipse (steps 650-730).,1.0,1.0
+TCS Radiator Thermal Excursion,SIM_SAT_03_TCS,1500,COMPATIBLE,1,0,3,3,Thermal control heating spike at radiator (steps 800-880).,,
+Telemetry Stream with Ground Station Packet Loss (NaNs),SIM_DEGRADED_STREAM,1200,COMPATIBLE,0,1,0,1,50 missing observations transparently causal-filled via forward fill.,,

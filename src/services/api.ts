@@ -1,264 +1,106 @@
-/**
- * SATSHIELD API Service Layer
- * 
- * Provides a clean abstraction between the UI and backend data sources.
- * Seamlessly connects to the FastAPI backend (http://localhost:8000) when running,
- * while offering instant fallback to high-fidelity demo data if the server is offline.
- */
-
-import { DEMO_CHANNELS, generateDemoTelemetrySeries } from '../data/demoTelemetry';
-import { DEMO_ANOMALIES } from '../data/demoAnomalies';
-import { DEMO_OVERALL_HEALTH, DEMO_SUBSYSTEMS, DEMO_SYSTEM_STATUS, DEMO_MISSIONS } from '../data/demoHealth';
+/** Real OrbitGuard API client. Operational data is never synthesized here. */
 import type { TelemetryChannel, TelemetryPoint } from '../types/telemetry';
 import type { AnomalyEvent } from '../types/anomaly';
-import type { OverallHealthMetrics, SubsystemHealth } from '../types/health';
-import type { SystemStatusState, MissionDataset } from '../types/mission';
-
-// Point directly to root FastAPI server (e.g. http://localhost:8000)
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
-
+import type { MissionDataset } from '../types/mission';
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+type Dataset = { id: string; channels: string[]; source: string; validation_status: string };
+type RawChannel = { id: string; name: string; subsystem: string; unit: string };
+async function request<T>(path: string, init?: RequestInit): Promise<T> { const response = await fetch(`${API}${path}`, init); if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body?.detail?.message || `Request failed (${response.status})`); } return response.json() as Promise<T>; }
 export class ApiService {
-  private static instance: ApiService;
-  private isBackendAvailable: boolean = false;
-  private backendChannelsCache: any[] = [];
-
+  private static instance: ApiService; private currentDataset?: string; private currentRun?: string;
   private constructor() {
-    this.checkBackendHealth();
+    const storedDataset = localStorage.getItem('orbitguard_dataset');
+    if (storedDataset) this.currentDataset = storedDataset;
+    const storedRun = localStorage.getItem('orbitguard_run');
+    if (storedRun) this.currentRun = storedRun;
   }
-
-  public static getInstance(): ApiService {
-    if (!ApiService.instance) {
-      ApiService.instance = new ApiService();
-    }
-    return ApiService.instance;
+  static getInstance() { return this.instance ||= new ApiService(); }
+  async checkBackendHealth() { await request('/health'); return true; }
+  async getDatasets() { return request<Dataset[]>('/datasets'); }
+  async setDataset(id: string) { 
+    this.currentDataset = id; 
+    this.currentRun = undefined; 
+    localStorage.setItem('orbitguard_dataset', id); 
+    localStorage.removeItem('orbitguard_run');
   }
-
-  /**
-   * Check if FastAPI backend is online
-   */
-  public async checkBackendHealth(): Promise<boolean> {
+  async selectDefaultDataset() { 
+    if (this.currentDataset) return this.currentDataset;
+    const stored = localStorage.getItem('orbitguard_dataset');
+    if (stored) { this.currentDataset = stored; return stored; }
+    
+    const datasets = await this.getDatasets(); 
+    if (!datasets.length) throw new Error('No validated telemetry dataset is available. Upload a compatible CSV to begin.'); 
+    this.currentDataset = datasets[0].id; 
+    localStorage.setItem('orbitguard_dataset', this.currentDataset);
+    return this.currentDataset; 
+  }
+  getCurrentDataset() { return this.currentDataset || localStorage.getItem('orbitguard_dataset'); }
+  async getChannels(): Promise<TelemetryChannel[]> { 
+    let dataset = await this.selectDefaultDataset(); 
+    let channels: RawChannel[];
     try {
-      const res = await fetch(`${API_BASE_URL}/healthz`, { signal: AbortSignal.timeout(2000) });
-      if (res.ok) {
-        const data = await res.json();
-        this.isBackendAvailable = data.status === 'ok';
-        return this.isBackendAvailable;
-      }
-      this.isBackendAvailable = false;
-      return false;
-    } catch {
-      this.isBackendAvailable = false;
-      return false;
-    }
-  }
-
-  public getBackendStatus(): boolean {
-    return this.isBackendAvailable;
-  }
-
-  // --- Telemetry Endpoints ---
-
-  public async getChannels(): Promise<TelemetryChannel[]> {
-    const isOnline = await this.checkBackendHealth();
-    if (!isOnline) {
-      return Promise.resolve(DEMO_CHANNELS);
-    }
-    try {
-      const res = await fetch(`${API_BASE_URL}/channels`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const rawChannels = await res.json();
-      this.backendChannelsCache = rawChannels;
-
-      // Transform backend channels to Frontend TelemetryChannel shape
-      const liveChannels: TelemetryChannel[] = rawChannels.map((c: any) => {
-        const isAnomaly = (c.anomaly_count || 0) > 0;
-        return {
-          id: c.channel_key, // e.g. 'P-1', 'S-1', 'PWR.BATT_TEMP'
-          name: `${c.source} — Channel ${c.channel_key}`,
-          subsystem: c.subsystem || 'Unknown / Unspecified',
-          unit: (c.units === '°C' ? '°C' : 'N/A') as any,
-          currentValue: 0.82,
-          baselineValue: 0.80,
-          stdDev: 0.15,
-          mean: 0.81,
-          min: -1.0,
-          max: 1.0,
-          anomalyScore: isAnomaly ? 0.92 : 0.05,
-          status: isAnomaly ? 'WARNING' : 'NOMINAL',
-          recentAnomalyCount: c.anomaly_count || 0,
-          description: `${c.source} Telemetry Stream. ${c.anomaly_type || 'Monitored sensor telemetry'}.`,
-        };
-      });
-
-      // Merge with demo channels so all tabs/visualizations have rich data
-      return [...liveChannels, ...DEMO_CHANNELS];
-    } catch (err) {
-      console.warn('Backend /channels fetch error, using demo channels:', err);
-      return DEMO_CHANNELS;
-    }
-  }
-
-  public async getTelemetrySeries(channelId: string = 'Channel_04'): Promise<TelemetryPoint[]> {
-    const isOnline = await this.checkBackendHealth();
-    if (!isOnline) {
-      return Promise.resolve(generateDemoTelemetrySeries(channelId));
-    }
-
-    try {
-      // Find matching backend channel id by channel_key
-      const found = this.backendChannelsCache.find(
-        (c: any) => c.channel_key === channelId || String(c.id) === channelId
-      );
-
-      if (found) {
-        const res = await fetch(`${API_BASE_URL}/timeseries?channel_id=${found.id}&downsample=200`);
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        const data = await res.json();
-        
-        if (data.points && data.points.length > 0) {
-          return data.points.map((p: any) => ({
-            timestamp: p.ts || `Step-${p.timestep}`,
-            epochSeconds: p.timestep,
-            value: p.value,
-            baseline: 0.0,
-            upperThreshold: 0.85,
-            lowerThreshold: -0.85,
-            isAnomaly: Math.abs(p.value) > 0.85,
-            anomalyScore: Math.abs(p.value) > 0.85 ? 0.92 : 0.05,
-          }));
+        channels = await request<RawChannel[]>(`/datasets/${encodeURIComponent(dataset)}/channels`); 
+    } catch (e: any) {
+        if (e.message && e.message.includes('404')) {
+            localStorage.removeItem('orbitguard_dataset');
+            this.currentDataset = undefined;
+            dataset = await this.selectDefaultDataset();
+            channels = await request<RawChannel[]>(`/datasets/${encodeURIComponent(dataset)}/channels`); 
+        } else {
+            throw e;
         }
-      }
-      return generateDemoTelemetrySeries(channelId);
-    } catch (err) {
-      console.warn('Backend /timeseries fetch error, using generated series:', err);
-      return generateDemoTelemetrySeries(channelId);
     }
-  }
-
-  // --- Anomaly Endpoints ---
-
-  public async getAnomalies(): Promise<AnomalyEvent[]> {
-    const isOnline = await this.checkBackendHealth();
-    if (!isOnline) {
-      return Promise.resolve(DEMO_ANOMALIES);
-    }
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/anomalies`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const rawAnomalies = await res.json();
-
-      const liveAnomalies: AnomalyEvent[] = rawAnomalies.slice(0, 15).map((a: any) => {
-        const isCritical = a.severity === 'critical' || a.score > 3.5;
-        const observedVal = a.evidence?.observed_peak ?? 0.85;
-        const baselineMean = a.evidence?.baseline_mean ?? 0.0;
-        const devSigma = a.evidence?.deviation_sigma ?? `+${a.score}σ`;
-
-        return {
-          id: `ANM-LIVE-${a.id}`,
-          timestamp: `${a.window_start || 'Recent'}`,
-          isoTimestamp: new Date().toISOString(),
-          channelId: a.channel_key || `Channel_${a.channel_id}`,
-          channelName: `${a.source} ${a.channel_key}`,
-          subsystem: a.subsystem || 'Telemetry Subsystem',
-          severity: isCritical ? 'CRITICAL' : 'HIGH',
-          status: 'ACTIVE',
-          anomalyScore: Math.min(1.0, a.score > 1 ? a.score / 5.0 : a.score),
-          observedValue: observedVal,
-          expectedValue: baselineMean,
-          thresholdValue: 3.0,
-          unit: 'Norm',
-          detectionMethod: a.method === 'zscore' ? 'Rolling Robust Z-Score' : 'Isolation Forest',
-          title: `${a.channel_key} ${a.method.toUpperCase()} Anomaly`,
-          summary: `Telemetry deviation detected on ${a.source} channel ${a.channel_key} (${devSigma}).`,
-          explanation: a.evidence?.operational_guidance || 'Observed telemetry deviated beyond nominal envelope.',
-          evidence: [
-            {
-              method: a.method === 'zscore' ? 'Statistical Baseline' : 'Isolation Forest',
-              confidenceNote: `Flagged with score ${a.score} (${devSigma})`,
-              zScoreOrResidual: a.score,
-              triggerCondition: `Exceeded threshold window [${a.start_step}..${a.end_step}]`,
-            },
-          ],
-          contributingChannels: [
-            {
-              channelId: a.channel_key,
-              name: `${a.channel_key} Sensor Vector`,
-              rank: 1,
-              subsystem: a.subsystem,
-              contributionScore: 0.95,
-              deviationDelta: devSigma,
-            },
-          ],
-          recommendedAction: a.evidence?.operational_guidance || 'Inspect telemetry trend and check adjacent channels.',
-          isDemoData: false,
-        };
-      });
-
-      return [...liveAnomalies, ...DEMO_ANOMALIES];
-    } catch (err) {
-      console.warn('Backend /anomalies fetch error, using demo anomalies:', err);
-      return DEMO_ANOMALIES;
-    }
-  }
-
-  public async getAnomalyById(id: string): Promise<AnomalyEvent | undefined> {
-    const list = await this.getAnomalies();
-    return list.find((a) => a.id === id);
-  }
-
-  // --- Health Endpoints ---
-
-  public async getOverallHealth(): Promise<OverallHealthMetrics> {
-    const isOnline = await this.checkBackendHealth();
-    if (!isOnline) {
-      return Promise.resolve(DEMO_OVERALL_HEALTH);
-    }
-    try {
-      const res = await fetch(`${API_BASE_URL}/channels`);
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-      const channels = await res.json();
-      const totalAnomalies = channels.reduce((acc: number, c: any) => acc + (c.anomaly_count || 0), 0);
-
-      return {
-        overallScore: totalAnomalies > 10 ? 82 : 95,
-        status: totalAnomalies > 0 ? 'ATTENTION' : 'NOMINAL',
-        activeAnomaliesCount: totalAnomalies > 0 ? 3 : 0,
-        criticalAlertsCount: 1,
-        monitoredChannelsCount: channels.length,
-        healthTrend: totalAnomalies > 5 ? 'DEGRADING' : 'STABLE',
-        lastUpdated: new Date().toLocaleTimeString() + ' UTC',
-        evaluatedSubsystems: 4,
-      };
-    } catch {
-      return DEMO_OVERALL_HEALTH;
-    }
-  }
-
-  public async getSubsystemHealth(): Promise<SubsystemHealth[]> {
-    return Promise.resolve(DEMO_SUBSYSTEMS);
-  }
-
-  // --- Mission & System Status ---
-
-  public async getSystemStatus(): Promise<SystemStatusState> {
-    return Promise.resolve(DEMO_SYSTEM_STATUS);
-  }
-
-  public async getMissions(): Promise<MissionDataset[]> {
-    return Promise.resolve(DEMO_MISSIONS);
-  }
-
-  // --- Trigger Live Detection ---
-
-  public async triggerDetection(channelId: number = 1, method: string = 'zscore'): Promise<any> {
-    const res = await fetch(`${API_BASE_URL}/run-detection`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ channel_id: channelId, method }),
+    const anomalies = await this.getAnomalies().catch(() => []);
+    return channels.map((c) => {
+        const count = anomalies.filter(a => a.channelId === c.id).length;
+        return { id:c.id,name:c.name,subsystem:c.subsystem,unit:c.unit as TelemetryChannel['unit'],currentValue:NaN,baselineValue:NaN,stdDev:NaN,mean:NaN,min:NaN,max:NaN,anomalyScore:NaN,status:count > 0 ? 'CRITICAL' : 'NOMINAL',recentAnomalyCount:count,description:'Values and anomaly status are available after selecting telemetry or running analysis.' };
     });
-    return await res.json();
   }
+  async getTelemetrySeries(channelId: string): Promise<TelemetryPoint[]> { 
+    const dataset = await this.selectDefaultDataset(); 
+    const data = await request<{ observations: { timestamp:string; value:number }[] }>(`/datasets/${encodeURIComponent(dataset)}/telemetry?channel=${encodeURIComponent(channelId)}`); 
+    
+    // Fetch anomalies for the current run to map them
+    let anomalyIntervals: {start: number, end: number}[] = [];
+    try {
+        if (this.currentRun) {
+            const anomalies = await request<RawEvent[]>(`/analysis/${this.currentRun}/events`);
+            anomalies.forEach(a => {
+                if (a.channel_id === channelId && a.start_index !== undefined && a.end_index !== undefined) {
+                    anomalyIntervals.push({start: a.start_index, end: a.end_index});
+                }
+            });
+        }
+    } catch(e) {}
+    
+    return data.observations.map((p, idx) => ({...p, isAnomaly: anomalyIntervals.some(interval => idx >= interval.start && idx <= interval.end)})); 
+  }
+  async runAnalysis(channel:string) { 
+    const dataset=await this.selectDefaultDataset(); 
+    const run=await request<{run_id:string;events:RawEvent[];detectors:unknown[]}>('/analysis/run',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({dataset_id:dataset,channel})}); 
+    this.currentRun=run.run_id; 
+    localStorage.setItem('orbitguard_run', run.run_id);
+    return run; 
+  }
+  async getAnomalies(): Promise<AnomalyEvent[]> { if (!this.currentRun) return []; return (await request<RawEvent[]>(`/analysis/${this.currentRun}/events`)).map(toAnomaly); }
+  async getAnomalyById(id:string) { return (await this.getAnomalies()).find((x)=>x.id===id); }
+  async getCurrentHealth() { 
+    if (!this.currentRun) return null; 
+    try {
+        return await request<{run_id:string;scope:string;channel_id:string;consensus_events:number;executed_detectors:number;status:string;health_indicator:number}>(`/analysis/${this.currentRun}/health`); 
+    } catch(e: any) {
+        if (e.message && e.message.includes('404')) {
+            this.currentRun = undefined;
+            localStorage.removeItem('orbitguard_run');
+            return null;
+        }
+        throw e;
+    }
+  }
+  async getHistory() { return request<{run_id:string;dataset_id:string;channel_id:string;event_count:number;duration_seconds:number}[]>('/history'); }
+  async getMissions(): Promise<MissionDataset[]> { const datasets=await this.getDatasets(); return datasets.map((d)=>({id:d.id,name:d.id,satelliteDesignation:d.source,orbitType:'Unknown / not supplied',epochStart:'Unavailable',totalPackets:0,anomalyEventsFound:0,status:d.validation_status==='AVAILABLE'||d.validation_status==='COMPATIBLE'?'ACTIVE':'ARCHIVED'})); }
+  async upload(file:File) { const data=new FormData(); data.append('file',file); const uploaded=await request<Dataset>('/datasets/upload',{method:'POST',body:data}); this.currentDataset=uploaded.id; this.currentRun=undefined; localStorage.removeItem('orbitguard_run'); return uploaded; }
 }
-
-export const apiService = ApiService.getInstance();
+type RawEvent={id:string;channel_id:string;timestamp:string;start_index?:number;end_index?:number;severity:string;detectors:string[];evidence:{observed_value:number;peak_score:number;unit:string;physical_meaning:string}};
+function toAnomaly(event:RawEvent):AnomalyEvent { const severity=['CRITICAL','HIGH','MEDIUM','LOW'].includes(event.severity)?event.severity as AnomalyEvent['severity']:'MEDIUM'; return {id:event.id,timestamp:event.timestamp,isoTimestamp:event.timestamp,channelId:event.channel_id,channelName:event.channel_id,subsystem:'Unknown / unmapped',severity,status:'ACTIVE',anomalyScore:event.evidence.peak_score,observedValue:event.evidence.observed_value,expectedValue:NaN,thresholdValue:NaN,unit:event.evidence.unit,detectionMethod:event.detectors.join(', '),title:`Consensus event on ${event.channel_id}`,summary:'Detected by the listed successfully executed detectors.',explanation:event.evidence.physical_meaning,evidence:event.detectors.map((method)=>({method:method==='Statistical Baseline'?'Statistical Baseline':'Isolation Forest',confidenceNote:'Evidence is attached to this run and event.',zScoreOrResidual:event.evidence.peak_score,triggerCondition:'Detector event overlapped in the consensus window.'})),contributingChannels:[{channelId:event.channel_id,name:event.channel_id,rank:1}],recommendedAction:'Inspect the displayed event interval and telemetry evidence; this is not a causal diagnosis.',isDemoData:false}; }
+export const apiService=ApiService.getInstance();

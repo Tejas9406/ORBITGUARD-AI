@@ -1,0 +1,138 @@
+[
+  {
+    "channel_id": "CADC0872",
+    "metadata": {
+      "subsystem": "ADCS (Attitude Determination & Control)",
+      "parameter": "Gyro Angular Velocity X",
+      "unit": "rad/s",
+      "description": "3-axis rate gyro measured angular rotation rate around body X-axis"
+    },
+    "evaluation_interval": [
+      0,
+      3000
+    ],
+    "ground_truth_events_count": 10,
+    "consensus_events_count": 1,
+    "detectors": {
+      "Statistical Baseline": {
+        "detector_name": "Statistical Baseline (Median/MAD)",
+        "detector_type": "Statistical Baseline",
+        "evaluation_scope": "Full Channel [0:3000]",
+        "total_observations": 3000,
+        "detected_events_count": 0,
+        "ground_truth_events_count": 10,
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 10,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "execution_time_seconds": 0.046,
+        "status": "Operational",
+        "gt_caught_count": 0
+      },
+      "Isolation Forest": {
+        "detector_name": "Isolation Forest (Unsupervised ML)",
+        "detector_type": "Machine Learning",
+        "evaluation_scope": "Full Channel [0:3000]",
+        "total_observations": 3000,
+        "detected_events_count": 9,
+        "ground_truth_events_count": 10,
+        "true_positives": 5,
+        "false_positives": 4,
+        "false_negatives": 6,
+        "precision": 0.5556,
+        "recall": 0.4,
+        "f1_score": 0.4651,
+        "execution_time_seconds": 0.85,
+        "status": "Operational",
+        "gt_caught_count": 4
+      },
+      "Sequence LSTM": {
+        "detector_name": "ESA-Trained Sequence LSTM",
+        "detector_type": "Deep Learning (ESA OPS-SAT LSTM)",
+        "evaluation_scope": "Full Channel [0:3000]",
+        "total_observations": 3000,
+        "detected_events_count": 1,
+        "ground_truth_events_count": 10,
+        "true_positives": 1,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "execution_time_seconds": 0.005,
+        "status": "Operational",
+        "gt_caught_count": 10
+      }
+    }
+  },
+  {
+    "channel_id": "CADC0892",
+    "metadata": {
+      "subsystem": "ADCS (Attitude Determination & Control)",
+      "parameter": "Fine Sun Sensor Elevation",
+      "unit": "rad",
+      "description": "Fine sun sensor pitch/elevation angle relative to boresight"
+    },
+    "evaluation_interval": [
+      0,
+      3000
+    ],
+    "ground_truth_events_count": 3,
+    "consensus_events_count": 0,
+    "detectors": {
+      "Statistical Baseline": {
+        "detector_name": "Statistical Baseline (Median/MAD)",
+        "detector_type": "Statistical Baseline",
+        "evaluation_scope": "Full Channel [0:3000]",
+        "total_observations": 3000,
+        "detected_events_count": 5,
+        "ground_truth_events_count": 3,
+        "true_positives": 2,
+        "false_positives": 3,
+        "false_negatives": 1,
+        "precision": 0.4,
+        "recall": 0.6667,
+        "f1_score": 0.5,
+        "execution_time_seconds": 0.033,
+        "status": "Operational",
+        "gt_caught_count": 2
+      },
+      "Isolation Forest": {
+        "detector_name": "Isolation Forest (Unsupervised ML)",
+        "detector_type": "Machine Learning",
+        "evaluation_scope": "Full Channel [0:3000]",
+        "total_observations": 3000,
+        "detected_events_count": 0,
+        "ground_truth_events_count": 3,
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "execution_time_seconds": 0.666,
+        "status": "Operational",
+        "gt_caught_count": 0
+      },
+      "Sequence LSTM": {
+        "detector_name": "ESA-Trained Sequence LSTM",
+        "detector_type": "Deep Learning (ESA OPS-SAT LSTM)",
+        "evaluation_scope": "Full Channel [0:3000]",
+        "total_observations": 3000,
+        "detected_events_count": 0,
+        "ground_truth_events_count": 3,
+        "true_positives": 0,
+        "false_positives": 0,
+        "false_negatives": 3,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1_score": 0.0,
+        "execution_time_seconds": 0.003,
+        "status": "Operational",
+        "gt_caught_count": 0
+      }
+    }
+  }
+]
