@@ -677,9 +677,18 @@ def run_analysis(req: RunAnalysisRequest):
             weights_path = ROOT / "data" / "2018-05-19_15.00.10" / "models" / f"{req.channel}.h5"
         elif req.dataset_id in DATASETS_CACHE:
             path = DATASETS_CACHE[req.dataset_id].get("file_path")
-            telemetry_input = ingest_csv(path, channel_id=req.channel, telemetry_column=req.channel)
+            cached_ds = DATASETS_CACHE[req.dataset_id]
+            import pandas as pd
+            df = pd.read_csv(path)
+            
+            # Resilient channel resolution
+            target_col = req.channel
+            if target_col not in df.columns or target_col == "CustomChannel":
+                available_cols = cached_ds.get("channels", [])
+                target_col = available_cols[0] if available_cols and available_cols[0] in df.columns else df.columns[0]
+            
+            telemetry_input = ingest_csv(path, channel_id=target_col, telemetry_column=target_col)
             try:
-                df = pd.read_csv(path)
                 if "is_anomaly" in df.columns:
                     anom_idx = df.index[df["is_anomaly"] == 1].tolist()
                     if anom_idx:
@@ -720,7 +729,7 @@ def get_run_events(run_id: str):
     if signal is None:
         signal = getattr(getattr(res, "telemetry_input", None), "target_signal", None)
 
-    for idx, ev in enumerate(res.consensus_events):
+    for idx, ev in enumerate(getattr(res, "consensus_events", [])):
         start = getattr(ev, "start", 0)
         end = getattr(ev, "end", 0)
         highest_score = round(float(getattr(ev, "highest_score", 0.0)), 4)
@@ -747,6 +756,32 @@ def get_run_events(run_id: str):
                 "physical_meaning": f"Consensus anomaly detected across {getattr(ev, 'agreement_count', len(detectors))} models: {', '.join(detectors)}."
             }
         })
+
+    # If consensus was not reached but individual detectors flagged anomalies, include them
+    if not events and hasattr(res, "evaluations"):
+        evt_idx = 0
+        for det_name, ev_data in res.evaluations.items():
+            for win in getattr(ev_data, "detected_windows", []):
+                s_idx = win.get("start_step", 0)
+                e_idx = win.get("end_step", s_idx)
+                sc = win.get("score", 0.0)
+                events.append({
+                    "id": f"evt-{evt_idx}",
+                    "channel_id": getattr(res, "channel_id", "Unknown"),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "start_index": s_idx,
+                    "end_index": e_idx,
+                    "severity": win.get("severity", "WARNING").upper(),
+                    "detectors": [det_name],
+                    "evidence": {
+                        "observed_value": win.get("evidence", {}).get("observed_peak", sc),
+                        "peak_score": sc,
+                        "unit": "raw",
+                        "physical_meaning": f"Anomaly flagged dynamically by {det_name} detector."
+                    }
+                })
+                evt_idx += 1
+
     return events
 
 @app.get("/api/v1/analysis/{run_id}/health", tags=["OrbitGuard Analysis"])

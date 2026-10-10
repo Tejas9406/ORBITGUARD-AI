@@ -107,7 +107,7 @@ export const CustomUploadPage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Upload className="w-4 h-4" /> Ingest & Set Active Dataset
+                  <Upload className="w-4 h-4" /> Execute AI Pipeline
                 </>
               )}
             </button>
