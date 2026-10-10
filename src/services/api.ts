@@ -2,6 +2,9 @@
 import type { TelemetryChannel, TelemetryPoint } from '../types/telemetry';
 import type { AnomalyEvent } from '../types/anomaly';
 import type { MissionDataset } from '../types/mission';
+import type { SatelliteMetadata } from '../types/satellite';
+import { SATELLITE_DIRECTORY } from '../data/satelliteDirectory';
+
 const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
 type Dataset = { id: string; channels: string[]; source: string; validation_status: string };
 type RawChannel = { id: string; name: string; subsystem: string; unit: string };
@@ -30,7 +33,8 @@ export class ApiService {
     
     const datasets = await this.getDatasets(); 
     if (!datasets.length) throw new Error('No validated telemetry dataset is available. Upload a compatible CSV to begin.'); 
-    this.currentDataset = datasets[0].id; 
+    const testingDs = datasets.find(d => d.id === 'testing-dataset');
+    this.currentDataset = testingDs ? testingDs.id : datasets[0].id; 
     localStorage.setItem('orbitguard_dataset', this.currentDataset);
     return this.currentDataset; 
   }
@@ -58,7 +62,7 @@ export class ApiService {
   }
   async getTelemetrySeries(channelId: string): Promise<TelemetryPoint[]> { 
     const dataset = await this.selectDefaultDataset(); 
-    const data = await request<{ observations: { timestamp:string; value:number }[] }>(`/datasets/${encodeURIComponent(dataset)}/telemetry?channel=${encodeURIComponent(channelId)}`); 
+    const data = await request<{ observations: { timestamp:string; value:number; isAnomaly?: boolean }[] }>(`/datasets/${encodeURIComponent(dataset)}/telemetry?channel=${encodeURIComponent(channelId)}`); 
     
     // Fetch anomalies for the current run to map them
     let anomalyIntervals: {start: number, end: number}[] = [];
@@ -71,9 +75,12 @@ export class ApiService {
                 }
             });
         }
-    } catch(e) {}
+    } catch {}
     
-    return data.observations.map((p, idx) => ({...p, isAnomaly: anomalyIntervals.some(interval => idx >= interval.start && idx <= interval.end)})); 
+    return data.observations.map((p, idx) => ({
+      ...p,
+      isAnomaly: Boolean(p.isAnomaly || anomalyIntervals.some(interval => idx >= interval.start && idx <= interval.end))
+    })); 
   }
   async runAnalysis(channel:string) { 
     const dataset=await this.selectDefaultDataset(); 
@@ -100,6 +107,20 @@ export class ApiService {
   async getHistory() { return request<{run_id:string;dataset_id:string;channel_id:string;event_count:number;duration_seconds:number}[]>('/history'); }
   async getMissions(): Promise<MissionDataset[]> { const datasets=await this.getDatasets(); return datasets.map((d)=>({id:d.id,name:d.id,satelliteDesignation:d.source,orbitType:'Unknown / not supplied',epochStart:'Unavailable',totalPackets:0,anomalyEventsFound:0,status:d.validation_status==='AVAILABLE'||d.validation_status==='COMPATIBLE'?'ACTIVE':'ARCHIVED'})); }
   async upload(file:File) { const data=new FormData(); data.append('file',file); const uploaded=await request<Dataset>('/datasets/upload',{method:'POST',body:data}); this.currentDataset=uploaded.id; this.currentRun=undefined; localStorage.removeItem('orbitguard_run'); return uploaded; }
+  async getSatellites(): Promise<SatelliteMetadata[]> {
+    try {
+      return await request<SatelliteMetadata[]>('/satellites');
+    } catch {
+      return SATELLITE_DIRECTORY;
+    }
+  }
+  async getFleetMetrics() {
+    try {
+      return await request<any>('/metrics');
+    } catch {
+      return { active_satellites: 7, pipeline_status: 'ONLINE', consensus_engine: 'ACTIVE' };
+    }
+  }
 }
 type RawEvent={id:string;channel_id:string;timestamp:string;start_index?:number;end_index?:number;severity:string;detectors:string[];evidence:{observed_value:number;peak_score:number;unit:string;physical_meaning:string}};
 function toAnomaly(event:RawEvent):AnomalyEvent { const severity=['CRITICAL','HIGH','MEDIUM','LOW'].includes(event.severity)?event.severity as AnomalyEvent['severity']:'MEDIUM'; return {id:event.id,timestamp:event.timestamp,isoTimestamp:event.timestamp,channelId:event.channel_id,channelName:event.channel_id,subsystem:'Unknown / unmapped',severity,status:'ACTIVE',anomalyScore:event.evidence.peak_score,observedValue:event.evidence.observed_value,expectedValue:NaN,thresholdValue:NaN,unit:event.evidence.unit,detectionMethod:event.detectors.join(', '),title:`Consensus event on ${event.channel_id}`,summary:'Detected by the listed successfully executed detectors.',explanation:event.evidence.physical_meaning,evidence:event.detectors.map((method)=>({method:method==='Statistical Baseline'?'Statistical Baseline':'Isolation Forest',confidenceNote:'Evidence is attached to this run and event.',zScoreOrResidual:event.evidence.peak_score,triggerCondition:'Detector event overlapped in the consensus window.'})),contributingChannels:[{channelId:event.channel_id,name:event.channel_id,rank:1}],recommendedAction:'Inspect the displayed event interval and telemetry evidence; this is not a causal diagnosis.',isDemoData:false}; }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { PageHeader } from '../components/layout/PageHeader';
 import { apiService } from '../services/api';
 export const SubsystemHealthPage: React.FC = () => {

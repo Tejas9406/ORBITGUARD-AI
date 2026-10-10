@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
-import { Upload, FileText, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Upload, FileText, AlertTriangle, Loader2 } from 'lucide-react';
 import { apiService } from '../services/api';
 
 export const CustomUploadPage: React.FC = () => {

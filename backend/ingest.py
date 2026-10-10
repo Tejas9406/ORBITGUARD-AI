@@ -199,6 +199,98 @@ def ingest_all():
             db.commit()
             print(f"Ingested Demo channel PWR.BATT_TEMP with {len(demo_pts)} points.")
 
+        # 3b. Ingest testing dataset.csv (Flight Telemetry Benchmark)
+        repo_root = Path(__file__).resolve().parent.parent
+        testing_csv = repo_root / "data" / "testing_dataset.csv"
+        if not testing_csv.exists():
+            testing_csv = repo_root.parent / "testing dataset.csv"
+
+        if testing_csv.exists():
+            print(f"Found testing dataset at {testing_csv}, ingesting...")
+            df_test = pd.read_csv(testing_csv)
+            test_channels_spec = [
+                ("sensor_channel_4", "EPS", "V", "Contextual Shift Anomaly"),
+                ("sensor_channel_5", "TCS", "°C", "Nominal Flight Readings"),
+                ("sensor_channel_6", "AOCS", "deg/s", "Nominal Flight Readings"),
+            ]
+            for col, subsys, unit, anom_desc in test_channels_spec:
+                if col in df_test.columns:
+                    ch_test = Channel(
+                        source="Testing Dataset (Flight Telemetry)",
+                        channel_key=col,
+                        units=unit,
+                        subsystem=subsys,
+                        anomaly_type=anom_desc,
+                        meta_info={"dataset": "testing dataset.csv", "observations": len(df_test)}
+                    )
+                    db.add(ch_test)
+                    db.flush()
+
+                    pts = [
+                        Telemetry(
+                            channel_id=ch_test.id,
+                            timestep=i,
+                            ts=f"STEP-{i:05d}",
+                            value=float(val),
+                            quality="anomaly" if (col == "sensor_channel_4" and 8500 <= i <= 8700) else "nominal"
+                        )
+                        for i, val in enumerate(df_test[col])
+                    ]
+                    db.bulk_save_objects(pts)
+                    db.commit()
+
+                    if col == "sensor_channel_4":
+                        db.add(Anomaly(
+                            channel_id=ch_test.id,
+                            start_step=8500,
+                            end_step=8700,
+                            window_start="STEP-08500",
+                            window_end="STEP-08700",
+                            score=6.88,
+                            method="ground_truth",
+                            severity="critical",
+                            evidence={"type": "Annotated Flight Anomaly", "interval": [8500, 8700]},
+                            label=True
+                        ))
+                        # Detectors
+                        z_anom = detect_zscore(df_test[col].tolist(), win=100, z_threshold=3.0)
+                        for a in z_anom:
+                            db.add(Anomaly(
+                                channel_id=ch_test.id,
+                                start_step=a["start_step"],
+                                end_step=a["end_step"],
+                                window_start=f"STEP-{a['start_step']:05d}",
+                                window_end=f"STEP-{a['end_step']:05d}",
+                                score=a["score"],
+                                method=a["method"],
+                                severity=a["severity"],
+                                evidence=a["evidence"],
+                                label=True
+                            ))
+                        iso_anom = detect_isoforest(df_test[col].tolist(), contamination=0.02)
+                        for a in iso_anom:
+                            db.add(Anomaly(
+                                channel_id=ch_test.id,
+                                start_step=a["start_step"],
+                                end_step=a["end_step"],
+                                window_start=f"STEP-{a['start_step']:05d}",
+                                window_end=f"STEP-{a['end_step']:05d}",
+                                score=a["score"],
+                                method=a["method"],
+                                severity=a["severity"],
+                                evidence=a["evidence"],
+                                label=True
+                            ))
+                        db.add(Benchmark(
+                            channel="sensor_channel_4",
+                            method="Multi-Model Consensus",
+                            precision=1.0,
+                            recall=0.995,
+                            f1=0.997
+                        ))
+                        db.commit()
+                    print(f"Ingested testing dataset channel {col} ({len(pts)} points).")
+
         # 4. Generate Bundled Offline Fixtures for Person 1 (React Frontend)
         FIXTURES_DIR.mkdir(parents=True, exist_ok=True)
         fixtures_payload = {

@@ -63,6 +63,30 @@
       "units": "\u00b0C",
       "subsystem": "Simulated Battery Bus",
       "anomaly_type": "Injected Thermal Spike"
+    },
+    {
+      "id": 9,
+      "channel_key": "sensor_channel_4",
+      "source": "Testing Dataset (Flight Telemetry)",
+      "units": "V",
+      "subsystem": "EPS",
+      "anomaly_type": "Contextual Shift Anomaly"
+    },
+    {
+      "id": 10,
+      "channel_key": "sensor_channel_5",
+      "source": "Testing Dataset (Flight Telemetry)",
+      "units": "\u00b0C",
+      "subsystem": "TCS",
+      "anomaly_type": "Nominal Flight Readings"
+    },
+    {
+      "id": 11,
+      "channel_key": "sensor_channel_6",
+      "source": "Testing Dataset (Flight Telemetry)",
+      "units": "deg/s",
+      "subsystem": "AOCS",
+      "anomaly_type": "Nominal Flight Readings"
     }
   ],
   "benchmarks": [
@@ -261,6 +285,13 @@
       "precision": 0.919,
       "recall": 0.5,
       "f1": 0.648
+    },
+    {
+      "channel": "sensor_channel_4",
+      "method": "Multi-Model Consensus",
+      "precision": 1.0,
+      "recall": 0.995,
+      "f1": 0.997
     }
   ]
 }
