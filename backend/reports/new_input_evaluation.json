@@ -1,0 +1,48 @@
+[
+  {
+    "scenario": "LEO Solar Array Bus Voltage (Nominal)",
+    "channel_id": "SIM_LEO_NOMINAL",
+    "observations": 1200,
+    "validation_status": "COMPATIBLE",
+    "gt_events": 0,
+    "statistical_events": 0,
+    "iso_forest_events": 0,
+    "consensus_events": 0,
+    "notes": "Nominal sinusoidal day-night cycle with zero anomalies."
+  },
+  {
+    "scenario": "EPS Battery Undervoltage Sag during Eclipse",
+    "channel_id": "SIM_SAT_02_EPS",
+    "observations": 1500,
+    "validation_status": "COMPATIBLE",
+    "gt_events": 1,
+    "statistical_events": 5,
+    "iso_forest_events": 5,
+    "statistical_recall": 1.0,
+    "iso_recall": 1.0,
+    "consensus_events": 7,
+    "notes": "Simulated battery cell droop in eclipse (steps 650-730)."
+  },
+  {
+    "scenario": "TCS Radiator Thermal Excursion",
+    "channel_id": "SIM_SAT_03_TCS",
+    "observations": 1500,
+    "validation_status": "COMPATIBLE",
+    "gt_events": 1,
+    "statistical_events": 0,
+    "iso_forest_events": 3,
+    "consensus_events": 3,
+    "notes": "Thermal control heating spike at radiator (steps 800-880)."
+  },
+  {
+    "scenario": "Telemetry Stream with Ground Station Packet Loss (NaNs)",
+    "channel_id": "SIM_DEGRADED_STREAM",
+    "observations": 1200,
+    "validation_status": "COMPATIBLE",
+    "gt_events": 0,
+    "statistical_events": 1,
+    "iso_forest_events": 0,
+    "consensus_events": 1,
+    "notes": "50 missing observations transparently causal-filled via forward fill."
+  }
+]

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
 import { TelemetryTimelineChart } from '../components/charts/TelemetryTimelineChart';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { LoadingState } from '../components/common/LoadingState';
 import { ErrorState } from '../components/common/ErrorState';
 import { useTelemetry } from '../hooks/useTelemetry';
+import { apiService } from '../services/api';
 import {
   Search,
   RotateCcw,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 
 export const TelemetryExplorerPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const queryChannel = searchParams.get('channel');
 
@@ -39,6 +41,15 @@ export const TelemetryExplorerPage: React.FC = () => {
   const [anomalyOnly, setAnomalyOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [subsystemFilter, setSubsystemFilter] = useState('ALL');
+  const [running, setRunning] = useState(false);
+  const [runError, setRunError] = useState<string | null>(null);
+  const runAnalysis = async () => {
+    if (!selectedChannel) return;
+    setRunning(true); setRunError(null);
+    try { await apiService.runAnalysis(selectedChannel.id); navigate('/anomalies'); }
+    catch (err) { setRunError(err instanceof Error ? err.message : 'Analysis failed'); }
+    finally { setRunning(false); }
+  };
 
   const filteredChannels = channels.filter((c) => {
     if (subsystemFilter !== 'ALL' && !c.subsystem.includes(subsystemFilter)) return false;
@@ -204,6 +215,11 @@ export const TelemetryExplorerPage: React.FC = () => {
 
         {/* Right 2 Columns: Large Plotly Chart + Channel Metrics */}
         <section aria-label="Channel Visualization and Details" className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between gap-3 rounded border border-cyan-500/30 bg-cyan-950/20 p-3 text-xs font-mono text-slate-300">
+            <span>Run supported detectors for the selected source channel.</span>
+            <button onClick={runAnalysis} disabled={running} className="rounded bg-cyan-600 px-3 py-1.5 font-bold text-white disabled:opacity-50">{running ? 'RUNNING…' : 'RUN ANALYSIS'}</button>
+          </div>
+          {runError && <div className="rounded border border-rose-500/50 p-3 text-xs text-rose-300">{runError}</div>}
           <TelemetryTimelineChart
             series={series}
             channelId={selectedChannel.id}

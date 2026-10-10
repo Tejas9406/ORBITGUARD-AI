@@ -12,6 +12,8 @@ import { TelemetryReplayPage } from './pages/TelemetryReplayPage';
 import { MissionHistoryPage } from './pages/MissionHistoryPage';
 import { SettingsPage } from './pages/SettingsPage';
 
+import { CustomUploadPage } from './pages/CustomUploadPage';
+
 export function App() {
   return (
     <BrowserRouter>
@@ -28,6 +30,7 @@ export function App() {
           <Route path="telemetry" element={<TelemetryExplorerPage />} />
           <Route path="anomalies" element={<AnomalyAnalysisPage />} />
           <Route path="health" element={<SubsystemHealthPage />} />
+          <Route path="upload" element={<CustomUploadPage />} />
           <Route path="replay" element={<TelemetryReplayPage />} />
           <Route path="history" element={<MissionHistoryPage />} />
           <Route path="settings" element={<SettingsPage />} />
