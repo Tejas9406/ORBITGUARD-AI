@@ -20,7 +20,8 @@ export function useTelemetry(initialChannelId: string = '') {
     let isCancelled = false;
     setIsLoading(true);
     apiService.getChannels().then(async (chList) => {
-      const active = chanId || chList[0]?.id;
+      const requestedChanExists = chList.some(c => c.id === chanId);
+      const active = (chanId && requestedChanExists) ? chanId : (chList[0]?.id);
       if (!active) throw new Error('The selected dataset contains no channels.');
       const serList = await apiService.getTelemetrySeries(active);
       if (!isCancelled) {

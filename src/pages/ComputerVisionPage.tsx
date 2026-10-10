@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
-import { runDemoVisionAnalysis } from '../services/demoVisionService';
-import type { VisionAnalysisResult, VisionDetection } from '../services/demoVisionService';
+import { apiService } from '../services/api';
+// type definitions for vision analysis might need to be sourced differently, let's keep any necessary types if possible or use any for now, but wait, `apiService.analyzeVision` returns `any`. I'll use `any` for the state or define inline if it causes type errors. Let's just remove the demo import and let TS tell me if it fails.
 import {
   UploadCloud,
   Image as ImageIcon,
@@ -19,11 +19,11 @@ export const ComputerVisionPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [analysisResult, setAnalysisResult] = useState<VisionAnalysisResult | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<any | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [showOverlays, setShowOverlays] = useState<boolean>(true);
-  const [selectedDetection, setSelectedDetection] = useState<VisionDetection | null>(null);
+  const [selectedDetection, setSelectedDetection] = useState<any | null>(null);
 
   const handleFileSelect = (file: File) => {
     setErrorMessage(null);
@@ -52,7 +52,7 @@ export const ComputerVisionPage: React.FC = () => {
   const triggerAnalysis = async (file: File) => {
     setIsAnalyzing(true);
     try {
-      const result = await runDemoVisionAnalysis(file);
+      const result = await apiService.analyzeVision(file);
       setAnalysisResult(result);
       if (result.detections.length > 0) {
         setSelectedDetection(result.detections[0]);
@@ -274,7 +274,7 @@ export const ComputerVisionPage: React.FC = () => {
               {/* Bounding Box Overlays */}
               {!isAnalyzing && showOverlays && analysisResult && (
                 <>
-                  {analysisResult.detections.map((det) => {
+                  {analysisResult.detections.map((det: any) => {
                     const isSelected = selectedDetection?.id === det.id;
                     return (
                       <div
