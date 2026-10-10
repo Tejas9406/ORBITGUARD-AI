@@ -43,5 +43,6 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
 
+# Transient uploaded datasets
+data/uploaded_*.csv

@@ -24,8 +24,13 @@ def detect_zscore(
         return []
 
     s = pd.Series(arr)
-    mu = s.rolling(win, min_periods=min_pts).mean()
-    sigma = s.rolling(win, min_periods=min_pts).std()
+    safe_min_pts = max(1, min(min_pts, win, n))
+    mu = s.rolling(win, min_periods=safe_min_pts).mean()
+    sigma = s.rolling(win, min_periods=safe_min_pts).std()
+    # Fallback to series-wide stats if rolling window is empty
+    if sigma.isna().all() and n > 1:
+        sigma = pd.Series([float(np.std(arr))] * n)
+        mu = pd.Series([float(np.mean(arr))] * n)
 
     # Protect against zero division when signal is constant
     sigma_safe = np.where(sigma.isna() | (sigma < eps), np.nan, sigma)

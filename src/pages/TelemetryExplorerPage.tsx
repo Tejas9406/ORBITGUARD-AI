@@ -203,7 +203,7 @@ export const TelemetryExplorerPage: React.FC = () => {
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1E2D4A]/50 text-xs font-mono">
                       <span className="text-slate-400">Value:</span>
                       <span className="font-bold text-slate-100">
-                        {chan.currentValue} {chan.unit}
+                        {!isNaN(chan.currentValue) ? chan.currentValue : '0.0000'} {chan.unit}
                       </span>
                     </div>
                   </div>
@@ -217,7 +217,7 @@ export const TelemetryExplorerPage: React.FC = () => {
         <section aria-label="Channel Visualization and Details" className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between gap-3 rounded border border-cyan-500/30 bg-cyan-950/20 p-3 text-xs font-mono text-slate-300">
             <span>Run supported detectors for the selected source channel.</span>
-            <button onClick={runAnalysis} disabled={running} className="rounded bg-cyan-600 px-3 py-1.5 font-bold text-white disabled:opacity-50">{running ? 'RUNNING…' : 'RUN ANALYSIS'}</button>
+            <button onClick={runAnalysis} disabled={running} className="rounded bg-cyan-600 px-3 py-1.5 font-bold text-white disabled:opacity-50 cursor-pointer">{running ? 'RUNNING…' : 'RUN ANALYSIS'}</button>
           </div>
           {runError && <div className="rounded border border-rose-500/50 p-3 text-xs text-rose-300">{runError}</div>}
           <TelemetryTimelineChart
@@ -244,28 +244,28 @@ export const TelemetryExplorerPage: React.FC = () => {
               <div className="p-2.5 rounded bg-[#090F1C] border border-[#182642]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Current</span>
                 <span className="text-base font-mono font-bold text-slate-100">
-                  {selectedChannel.currentValue} <span className="text-xs">{selectedChannel.unit}</span>
+                  {!isNaN(selectedChannel.currentValue) ? selectedChannel.currentValue : '0.0000'} <span className="text-xs">{selectedChannel.unit}</span>
                 </span>
               </div>
 
               <div className="p-2.5 rounded bg-[#090F1C] border border-[#182642]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Rolling Mean</span>
                 <span className="text-base font-mono font-bold text-cyan-300">
-                  {selectedChannel.mean} <span className="text-xs">{selectedChannel.unit}</span>
+                  {!isNaN(selectedChannel.mean) ? selectedChannel.mean : '0.0000'} <span className="text-xs">{selectedChannel.unit}</span>
                 </span>
               </div>
 
               <div className="p-2.5 rounded bg-[#090F1C] border border-[#182642]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Std Dev (σ)</span>
                 <span className="text-base font-mono font-bold text-slate-200">
-                  ±{selectedChannel.stdDev}
+                  ±{!isNaN(selectedChannel.stdDev) ? selectedChannel.stdDev : '0.0000'}
                 </span>
               </div>
 
               <div className="p-2.5 rounded bg-[#090F1C] border border-[#182642]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Min / Max</span>
                 <span className="text-xs font-mono font-medium text-slate-300 block mt-1">
-                  {selectedChannel.min} - {selectedChannel.max}
+                  {!isNaN(selectedChannel.min) ? selectedChannel.min : '0.0000'} - {!isNaN(selectedChannel.max) ? selectedChannel.max : '0.0000'}
                 </span>
               </div>
 
@@ -280,17 +280,18 @@ export const TelemetryExplorerPage: React.FC = () => {
                       : 'text-emerald-400'
                   }`}
                 >
-                  {selectedChannel.anomalyScore}
+                  {!isNaN(selectedChannel.anomalyScore) ? selectedChannel.anomalyScore : '0.00'}
                 </span>
               </div>
 
               <div className="p-2.5 rounded bg-[#090F1C] border border-[#182642]">
                 <span className="text-[10px] font-mono text-slate-400 uppercase block">Active Anomalies</span>
                 <span className="text-base font-mono font-bold text-rose-400">
-                  {selectedChannel.recentAnomalyCount}
+                  {selectedChannel.recentAnomalyCount ?? 0}
                 </span>
               </div>
             </div>
+
 
             <div className="mt-4 p-3 rounded bg-[#0A1224] border border-[#1E2D4A] text-xs font-mono text-slate-400 flex items-start gap-2">
               <Info className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />

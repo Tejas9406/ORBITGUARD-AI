@@ -185,10 +185,70 @@ class TestAPIEndpoints(unittest.TestCase):
         self.assertIn("voltage_a", chans)
         self.assertIn("temp_b", chans)
 
-    def test_not_found_dataset_returns_404(self):
-        r = self.client.get("/api/v1/datasets/unknown-ds-404/channels")
-        self.assertEqual(r.status_code, 404)
+    def test_dynamic_channel_statistics_in_testing_dataset(self):
+        r = self.client.get("/api/v1/datasets/testing-dataset/channels")
+        self.assertEqual(r.status_code, 200)
+        chans = r.json()
+        self.assertEqual(len(chans), 3)
+        for c in chans:
+            self.assertIn("current_value", c)
+            self.assertIn("mean", c)
+            self.assertIn("std_dev", c)
+            self.assertIn("min", c)
+            self.assertIn("max", c)
+            self.assertIn("anomaly_score", c)
+            self.assertFalse(np.isnan(c["mean"]))
+            self.assertFalse(np.isnan(c["current_value"]))
+
+        # Channel 4 must have 201 anomalies and CRITICAL status
+        ch4 = next(c for c in chans if c["id"] == "sensor_channel_4")
+        self.assertEqual(ch4["status"], "CRITICAL")
+        self.assertEqual(ch4["anomaly_count"], 201)
+
+    def test_dynamic_vision_analysis_spacecraft_defect(self):
+        from PIL import Image, ImageDraw
+        img = Image.new("RGB", (400, 400), color=(8, 15, 35))
+        d = ImageDraw.Draw(img)
+        d.rectangle([100, 100, 300, 300], fill=(15, 50, 110))
+        d.line([140, 140, 180, 220, 210, 200], fill=(255, 60, 80), width=4)
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        buf.seek(0)
+
+        files = {"file": ("solar_array_inspect.png", buf, "image/png")}
+        r = self.client.post("/api/v1/vision/analyze", files=files)
+        self.assertEqual(r.status_code, 200)
+        res = r.json()
+        self.assertFalse(res["isSimulated"])
+        self.assertEqual(res["domain"], "SPACECRAFT_HARDWARE")
+        self.assertGreater(res["totalDetections"], 0)
+        det = res["detections"][0]
+        self.assertIn("x", det["boundingBox"])
+        self.assertIn("y", det["boundingBox"])
+        self.assertIn("width", det["boundingBox"])
+        self.assertIn("height", det["boundingBox"])
+        self.assertIn("confidence", det)
+        self.assertIn("recommendation", det)
+
+    def test_dynamic_vision_analysis_unrelated_image(self):
+        from PIL import Image
+        # Natural daytime image (uniform bright daylight)
+        img = Image.new("RGB", (300, 300), color=(220, 230, 240))
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG")
+        buf.seek(0)
+
+        files = {"file": ("outdoor_daylight.jpg", buf, "image/jpeg")}
+        r = self.client.post("/api/v1/vision/analyze", files=files)
+        self.assertEqual(r.status_code, 200)
+        res = r.json()
+        self.assertFalse(res["isSimulated"])
+        self.assertEqual(res["domain"], "NON_AEROSPACE_IMAGE")
+        self.assertEqual(res["totalDetections"], 0)
+        self.assertEqual(res["criticalCount"], 0)
+        self.assertIn("no satellite structural", res["summary"].lower())
 
 
 if __name__ == "__main__":
     unittest.main()
+
