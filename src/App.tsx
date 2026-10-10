@@ -1,6 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppShell } from './components/layout/AppShell';
+import { LandingPage } from './pages/LandingPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { SatelliteIntelligencePage } from './pages/SatelliteIntelligencePage';
+import { SpacecraftDigitalTwinPage } from './pages/SpacecraftDigitalTwinPage';
+import { ComputerVisionPage } from './pages/ComputerVisionPage';
 import { TelemetryExplorerPage } from './pages/TelemetryExplorerPage';
 import { AnomalyAnalysisPage } from './pages/AnomalyAnalysisPage';
 import { SubsystemHealthPage } from './pages/SubsystemHealthPage';
@@ -12,9 +16,15 @@ export function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AppShell />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
+        {/* Landing Page Route */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Mission Control AppShell Routes */}
+        <Route element={<AppShell />}>
           <Route path="dashboard" element={<DashboardPage />} />
+          <Route path="satellites" element={<SatelliteIntelligencePage />} />
+          <Route path="spacecraft" element={<SpacecraftDigitalTwinPage />} />
+          <Route path="vision" element={<ComputerVisionPage />} />
           <Route path="telemetry" element={<TelemetryExplorerPage />} />
           <Route path="anomalies" element={<AnomalyAnalysisPage />} />
           <Route path="health" element={<SubsystemHealthPage />} />

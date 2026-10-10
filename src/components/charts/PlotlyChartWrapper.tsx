@@ -33,7 +33,7 @@ export const PlotlyChartWrapper: React.FC<PlotlyChartProps> = ({
       paper_bgcolor: tokens.chartTheme.paperBg,
       plot_bgcolor: tokens.chartTheme.plotBg,
       font: {
-        family: 'Inter, monospace',
+        family: 'Kineks, sans-serif',
         size: 11,
         color: tokens.chartTheme.fontColor,
       },
@@ -44,7 +44,7 @@ export const PlotlyChartWrapper: React.FC<PlotlyChartProps> = ({
         bgcolor: '#15213B',
         bordercolor: '#00E5FF',
         font: {
-          family: 'JetBrains Mono, monospace',
+          family: 'JetBrains Mono, Kineks, monospace',
           size: 11,
           color: '#F1F5F9',
         },
@@ -52,14 +52,14 @@ export const PlotlyChartWrapper: React.FC<PlotlyChartProps> = ({
       xaxis: {
         gridcolor: tokens.chartTheme.gridColor,
         zerolinecolor: tokens.chartTheme.zeroLineColor,
-        tickfont: { color: tokens.colors.textSecondary, size: 10, family: 'JetBrains Mono' },
+        tickfont: { color: tokens.colors.textSecondary, size: 10, family: 'JetBrains Mono, Kineks, monospace' },
         showgrid: true,
         gridwidth: 1,
       },
       yaxis: {
         gridcolor: tokens.chartTheme.gridColor,
         zerolinecolor: tokens.chartTheme.zeroLineColor,
-        tickfont: { color: tokens.colors.textSecondary, size: 10, family: 'JetBrains Mono' },
+        tickfont: { color: tokens.colors.textSecondary, size: 10, family: 'JetBrains Mono, Kineks, monospace' },
         showgrid: true,
         gridwidth: 1,
       },

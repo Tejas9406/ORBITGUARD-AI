@@ -4,6 +4,7 @@ import {
   Bell,
   Satellite,
   Clock,
+  Home,
 } from 'lucide-react';
 import { StatusBadge } from '../common/StatusBadge';
 import { Link } from 'react-router-dom';
@@ -73,6 +74,16 @@ export const TopBar: React.FC<TopBarProps> = ({
           <Clock className="w-3.5 h-3.5 text-cyan-400" />
           <span>10:54:20 UTC</span>
         </div>
+
+        {/* Landing Page Link */}
+        <Link
+          to="/"
+          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#0A162C] hover:bg-[#112344] border border-[#1E355B] hover:border-cyan-400 text-slate-300 hover:text-white text-xs font-mono transition-colors"
+          title="Return to SatShield Landing Page"
+        >
+          <Home className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Landing</span>
+        </Link>
 
         {/* Active Alerts Dropdown */}
         <div className="relative">

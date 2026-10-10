@@ -1,3 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / Coverage / Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Python Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Local databases (large binaries)
+*.db
+backend/satshield.db
+
+# Node / Frontend
+node_modules
+dist
+dist-ssr
+*.local
+
 # Logs
 logs
 *.log
@@ -6,11 +32,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*

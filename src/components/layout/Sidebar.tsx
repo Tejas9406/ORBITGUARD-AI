@@ -11,6 +11,9 @@ import {
   Shield,
   Radio,
   Server,
+  Globe,
+  Cpu,
+  Eye,
   ChevronLeft,
   ChevronRight,
   Database,
@@ -31,6 +34,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems = [
     { name: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+    { name: 'Fleet Directory', to: '/satellites', icon: Globe },
+    { name: '3D Spacecraft Twin', to: '/spacecraft', icon: Cpu },
+    { name: 'Computer Vision', to: '/vision', icon: Eye },
     { name: 'Telemetry Explorer', to: '/telemetry', icon: Activity },
     { name: 'Anomalies', to: '/anomalies', icon: AlertOctagon, badge: '2 ACTIVE' },
     { name: 'Subsystem Health', to: '/health', icon: HeartPulse },

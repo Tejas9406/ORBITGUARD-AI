@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
 import { KpiCard } from '../components/common/KpiCard';
 import { SubsystemCard } from '../components/common/SubsystemCard';
@@ -13,6 +13,7 @@ import { ErrorState } from '../components/common/ErrorState';
 import { useHealth } from '../hooks/useHealth';
 import { useTelemetry } from '../hooks/useTelemetry';
 import { useAnomalies } from '../hooks/useAnomalies';
+import { SATELLITE_DIRECTORY } from '../data/satelliteDirectory';
 import {
   HeartPulse,
   AlertTriangle,
@@ -29,6 +30,10 @@ import {
 
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const querySatId = searchParams.get('satellite');
+  const targetedSat = querySatId ? SATELLITE_DIRECTORY.find((s) => s.id === querySatId) : null;
+
   const { overallHealth, subsystems, isLoading: isHealthLoading, error: healthError } = useHealth();
   const { series, selectedChannel, isLoading: isTelemetryLoading, error: telemetryError } = useTelemetry('Channel_04');
   const { anomalies } = useAnomalies();
@@ -129,11 +134,33 @@ export const DashboardPage: React.FC = () => {
         />
       </section>
 
+      {/* Focused Satellite Target Banner (when redirected from 3D Earth) */}
+      {targetedSat && (
+        <div className="p-3.5 rounded bg-[#09152C]/90 border border-cyan-500/50 backdrop-blur-md flex items-center justify-between text-xs font-mono animate-fade-in shadow-[0_0_20px_rgba(0,229,255,0.18)]">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+            <span className="text-slate-400 font-semibold uppercase">FOCUSED ORBITAL TARGET:</span>
+            <span className="text-white font-bold text-sm">{targetedSat.name}</span>
+            <span className="text-slate-500">|</span>
+            <span className="text-cyan-300">{targetedSat.orbitType} ({targetedSat.altitudeKm} km)</span>
+            <span className="text-slate-500">|</span>
+            <span className="text-slate-300">Ground Track: {targetedSat.currentSubpoint.geographicRegion}</span>
+          </div>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-slate-400 hover:text-cyan-300 text-[11px] underline cursor-pointer ml-4"
+          >
+            Clear Focus
+          </button>
+        </div>
+      )}
+
       {/* Main Section: 3D Earth Orbit (Left 8 Cols) + Active Anomalies Queue (Right 4 Cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         <section aria-label="3D Earth Orbit Visualization" className="lg:col-span-8 flex flex-col">
           <SatelliteGlobe
-            status="CRITICAL"
+            selectedSatelliteId={targetedSat ? targetedSat.id : undefined}
+            status={targetedSat ? targetedSat.status : 'CRITICAL'}
             healthScore={overallHealth?.overallScore ?? 84}
             activeAnomaliesCount={overallHealth?.activeAnomaliesCount ?? 2}
             height={440}

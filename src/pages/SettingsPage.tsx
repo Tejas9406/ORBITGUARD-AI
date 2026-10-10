@@ -6,7 +6,7 @@ import { apiService } from '../services/api';
 import { Server, Monitor, Save, Check, RefreshCw, Wifi, WifiOff } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
-  const [apiUrl, setApiUrl] = useState('http://localhost:8000/api/v1');
+  const [apiUrl, setApiUrl] = useState('http://localhost:8000');
   const [useDemoData, setUseDemoData] = useState(true);
   const [alertSound, setAlertSound] = useState(true);
   const [autoRefreshHz, setAutoRefreshHz] = useState('1');
