@@ -394,7 +394,7 @@ export const TelemetryChart: React.FC<TelemetryChartProps> = ({
                   : 'bg-slate-900/60 text-slate-500 border-slate-800'
               }`}
             >
-              [ ANOMALIES ({anomalyPoints.length}) ]
+              [ ANOMALIES ({series.filter((p) => p.isAnomaly).length}) ]
             </button>
           </div>
 

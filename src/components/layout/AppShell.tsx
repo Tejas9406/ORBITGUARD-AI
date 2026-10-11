@@ -37,7 +37,7 @@ export const AppShell: React.FC = () => {
         <footer className="mt-auto border-t border-[#1E2D4A] bg-[#0A0F1E] px-4 md:px-6 py-3 text-xs font-mono text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>OrbitGuard telemetry intelligence</span>
+            <span>SatShield telemetry intelligence</span>
           </div>
           <div className="flex items-center gap-4 text-[11px] text-slate-400">
             <span>Data source and detector status are shown per analysis run.</span>

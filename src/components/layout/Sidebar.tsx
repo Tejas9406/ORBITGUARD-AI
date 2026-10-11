@@ -71,10 +71,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {!isCollapsed && (
               <div className="flex flex-col truncate">
                 <span className="font-mono font-bold text-base tracking-wider text-slate-100 flex items-center gap-1.5">
-                  ORBIT<span className="text-cyan-400">GUARD</span>
+                  SAT<span className="text-cyan-400">SHIELD</span>
                 </span>
                 <span className="text-[10px] tracking-tight text-slate-400 truncate">
-                  GENERIC TELEMETRY PLATFORM
+                  AEROSPACE PLATFORM
                 </span>
               </div>
             )}
@@ -138,7 +138,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <Server className="w-3.5 h-3.5 text-cyan-400" />
                     AI Engine:
                   </span>
-                  <span className="text-cyan-400 font-medium">ORBITGUARD CORE</span>
+                  <span className="text-cyan-400 font-medium">SATSHIELD CORE</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-400">
                   <span className="flex items-center gap-1.5">
