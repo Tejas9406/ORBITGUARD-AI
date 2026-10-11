@@ -15,7 +15,7 @@ export const DashboardPage: React.FC = () => {
   if (isLoading) return <LoadingState message="Loading registered telemetry" submessage="Reading dataset metadata and source observations." />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   return <div className="space-y-6">
-    <PageHeader title="OrbitGuard overview" subtitle="Registered datasets and the currently selected source telemetry. Analysis results appear only after you run detectors." badge="DATA-DRIVEN" />
+    <PageHeader title="SatShield overview" subtitle="Registered datasets and the currently selected source telemetry. Analysis results appear only after you run detectors." badge="DATA-DRIVEN" />
     <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="sat-panel p-5"><Database className="w-5 h-5 text-cyan-400 mb-3"/><p className="text-2xl font-mono font-bold">{channels.length}</p><p className="text-xs text-slate-400 mt-1">available channels in selected dataset</p></div>
       <div className="sat-panel p-5"><AlertTriangle className="w-5 h-5 text-amber-400 mb-3"/><p className="text-2xl font-mono font-bold">{anomalies.length}</p><p className="text-xs text-slate-400 mt-1">consensus events in this browser session</p></div>

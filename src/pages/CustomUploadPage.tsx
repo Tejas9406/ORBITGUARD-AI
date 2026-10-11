@@ -50,7 +50,7 @@ export const CustomUploadPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Custom Telemetry Ingestion"
-        subtitle="Upload raw multi-sensor telemetry (CSV) to process through the OrbitGuard anomaly detection pipeline."
+        subtitle="Upload raw multi-sensor telemetry (CSV) to process through the SatShield anomaly detection pipeline."
         badge="REAL-WORLD ANALYSIS"
       />
 
