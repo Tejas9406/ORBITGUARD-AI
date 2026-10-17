@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LandingEarthScene } from '../components/landing/LandingEarthScene';
 import {
-  Shield,
   ArrowRight,
   Activity,
   AlertTriangle,
@@ -41,15 +40,20 @@ export const LandingPage: React.FC = () => {
       {/* Top Navigation Bar */}
       <header className="fixed top-0 left-0 right-0 z-50 h-20 px-6 lg:px-12 flex items-center justify-between border-b border-[#142340]/60 bg-[#030611]/80 backdrop-blur-md">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/30 border border-cyan-400/50 flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.3)]">
-            <Shield className="w-5 h-5 text-cyan-400" />
+          <div className="relative group shrink-0 flex items-center justify-center">
+            <div className="absolute -inset-1 rounded-full bg-cyan-400/35 blur-md group-hover:bg-cyan-400/60 transition-all duration-700 animate-pulse-slow"></div>
+            <img
+              src="/logo.png"
+              alt="SATSHIELD Logo"
+              className="relative w-11 h-11 object-contain rounded-full border border-cyan-400/50 p-0.5 bg-[#060D1C] shadow-[0_0_18px_rgba(0,229,255,0.7)]"
+            />
           </div>
           <div>
             <span className="font-display text-xl tracking-wider text-white">
               SAT<span className="text-cyan-400">SHIELD</span>
             </span>
             <span className="hidden sm:inline-block ml-3 px-2 py-0.5 text-[10px] font-mono tracking-widest uppercase bg-cyan-950/80 text-cyan-300 border border-cyan-800/60 rounded">
-              v1.0 AEROSPACE PLATFORM
+              AEROSPACE PLATFORM
             </span>
           </div>
         </div>

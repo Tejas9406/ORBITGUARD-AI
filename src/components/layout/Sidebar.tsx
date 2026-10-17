@@ -8,7 +8,6 @@ import {
   PlayCircle,
   History,
   Settings,
-  Shield,
   Radio,
   Server,
   Globe,
@@ -65,8 +64,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Logo / Brand Header */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-[#1E2D4A] bg-[#070B14]">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-9 h-9 rounded bg-gradient-to-br from-cyan-500/20 to-blue-600/30 border border-cyan-400/50 flex items-center justify-center shrink-0 shadow-[0_0_12px_rgba(0,229,255,0.25)]">
-              <Shield className="w-5 h-5 text-cyan-400" />
+            <div className="relative group shrink-0 flex items-center justify-center">
+              <div className="absolute -inset-1 rounded-full bg-cyan-400/35 blur-md group-hover:bg-cyan-400/60 transition-all duration-700 animate-pulse-slow"></div>
+              <img
+                src="/logo.png"
+                alt="SATSHIELD Logo"
+                className="relative w-9 h-9 object-contain rounded-full border border-cyan-400/50 p-0.5 bg-[#060D1C] shadow-[0_0_16px_rgba(0,229,255,0.65)]"
+              />
             </div>
             {!isCollapsed && (
               <div className="flex flex-col truncate">

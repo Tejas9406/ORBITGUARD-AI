@@ -23,6 +23,24 @@ export const SpacecraftModel: React.FC<SpacecraftModelProps> = ({
   const [hoveredSubsystem, setHoveredSubsystem] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Dynamic state refs to prevent Three.js scene re-mounts on hover / selection changes
+  const selectedSubsystemRef = useRef<SubsystemKey>(selectedSubsystem);
+  const activeAnomalySubsystemRef = useRef<SubsystemKey | null | undefined>(activeAnomalySubsystem);
+  const onSelectSubsystemRef = useRef(onSelectSubsystem);
+  const hoveredSubsystemRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    selectedSubsystemRef.current = selectedSubsystem;
+  }, [selectedSubsystem]);
+
+  useEffect(() => {
+    activeAnomalySubsystemRef.current = activeAnomalySubsystem;
+  }, [activeAnomalySubsystem]);
+
+  useEffect(() => {
+    onSelectSubsystemRef.current = onSelectSubsystem;
+  }, [onSelectSubsystem]);
+
   // References for Three.js state
   const threeRef = useRef<{
     renderer: THREE.WebGLRenderer;
@@ -208,12 +226,18 @@ export const SpacecraftModel: React.FC<SpacecraftModelProps> = ({
         }
         if (obj && obj.userData && obj.userData.subsystemKey) {
           const key = obj.userData.subsystemKey as SubsystemKey;
-          setHoveredSubsystem(key);
+          if (hoveredSubsystemRef.current !== key) {
+            hoveredSubsystemRef.current = key;
+            setHoveredSubsystem(key);
+          }
           container.style.cursor = 'pointer';
           return;
         }
       }
-      setHoveredSubsystem(null);
+      if (hoveredSubsystemRef.current !== null) {
+        hoveredSubsystemRef.current = null;
+        setHoveredSubsystem(null);
+      }
       container.style.cursor = isDragging ? 'grabbing' : 'grab';
     };
 
@@ -227,7 +251,7 @@ export const SpacecraftModel: React.FC<SpacecraftModelProps> = ({
         }
         if (obj && obj.userData && obj.userData.subsystemKey) {
           const key = obj.userData.subsystemKey as SubsystemKey;
-          onSelectSubsystem(key);
+          onSelectSubsystemRef.current(key);
         }
       }
     };
@@ -282,11 +306,11 @@ export const SpacecraftModel: React.FC<SpacecraftModelProps> = ({
         spacecraftGroup.rotation.y += 0.0025;
       }
 
-      // Highlight selected or anomaly subsystem meshes
+      // Highlight selected or anomaly subsystem meshes without causing canvas unmounts
       subsystemMeshes.forEach((meshes, key) => {
-        const isSelected = selectedSubsystem === key;
-        const isAnomaly = activeAnomalySubsystem === key;
-        const isHovered = hoveredSubsystem === key;
+        const isSelected = selectedSubsystemRef.current === key;
+        const isAnomaly = activeAnomalySubsystemRef.current === key;
+        const isHovered = hoveredSubsystemRef.current === key;
 
         meshes.forEach((m) => {
           const mat = m.material as THREE.MeshStandardMaterial;
@@ -356,7 +380,7 @@ export const SpacecraftModel: React.FC<SpacecraftModelProps> = ({
       renderer.dispose();
       container.innerHTML = '';
     };
-  }, [height, selectedSubsystem, activeAnomalySubsystem, hoveredSubsystem, onSelectSubsystem]);
+  }, [height]);
 
   return (
     <div className={`relative w-full rounded sat-panel overflow-hidden border border-[#162744] ${className}`}>

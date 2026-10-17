@@ -1,4 +1,4 @@
-"""OrbitGuard AI Computer Vision Module
+"""SatShield Computer Vision Module
 Dynamic spacecraft visual inspection, defect detection, and telemetry correlation engine.
 Processes imagery using multi-scale gradient and variance analysis to identify micro-fractures,
 MLI delaminations, and optical surface anomalies.
@@ -57,14 +57,24 @@ def analyze_spacecraft_image(image_bytes: bytes, filename: str = "") -> Dict[str
     blue_dominance = mean_b / (mean_r + 1e-4)
     amber_dominance = (mean_r + mean_g) / (2.0 * mean_b + 1e-4)
 
+    # Non-aerospace indicators (e.g., flowers, nature, gardens, indoor portraits, food)
+    is_organic_or_nature = (
+        (mean_g > mean_b * 1.15 and mean_g > 55.0) # Green foliage / plants
+        or (mean_r > 130 and mean_g > 70 and mean_b < 90 and dark_bg_ratio < 0.05) # Floral reds/yellows in daylight
+        or (dark_bg_ratio < 0.08 and mean_lum > 70.0 and "space" not in filename.lower() and "sat" not in filename.lower()) # Standard daylight photo
+    )
+
     # Spacecraft context classification heuristic
     is_space_context = (
-        dark_bg_ratio > 0.15
-        or (std_lum > 42.0 and (blue_dominance > 1.2 or amber_dominance > 1.35))
-        or "solar" in filename.lower()
-        or "space" in filename.lower()
-        or "panel" in filename.lower()
-        or "sat" in filename.lower()
+        not is_organic_or_nature
+        and (
+            dark_bg_ratio > 0.14
+            or (std_lum > 42.0 and (blue_dominance > 1.25 or amber_dominance > 1.4))
+            or "solar" in filename.lower()
+            or "space" in filename.lower()
+            or "panel" in filename.lower()
+            or "sat" in filename.lower()
+        )
     )
 
     domain = "SPACECRAFT_HARDWARE" if is_space_context else "NON_AEROSPACE_IMAGE"
@@ -86,8 +96,7 @@ def analyze_spacecraft_image(image_bytes: bytes, filename: str = "") -> Dict[str
     z_text = (local_std - np.mean(local_std)) / (np.std(local_std) + 1e-5)
 
     # Threshold for candidate defect areas
-    # If it's a non-aerospace image, use a significantly stricter threshold to prevent false positive alerts on natural objects
-    cand_thresh = 3.6 if is_space_context else 5.2
+    cand_thresh = 3.6 if is_space_context else 5.5
     defect_mask = (z_grad > cand_thresh) & (z_text > 1.5)
 
     # Morphological clean up
@@ -97,9 +106,8 @@ def analyze_spacecraft_image(image_bytes: bytes, filename: str = "") -> Dict[str
 
     detections: List[Dict[str, Any]] = []
 
-    # If non-aerospace and background is uniform or natural daylight photo, avoid fake defects
-    if not is_space_context and (dark_bg_ratio < 0.05 or num_features > 40):
-        # Image is ordinary natural scene, selfie, document, or food: accurately return 0 defects
+    # If non-aerospace, avoid false positives and prompt the user for spacecraft media
+    if not is_space_context:
         detections = []
     else:
         # Extract bounding boxes for top defect clusters
@@ -186,19 +194,30 @@ def analyze_spacecraft_image(image_bytes: bytes, filename: str = "") -> Dict[str
 
     critical_count = sum(1 for d in detections if d["severity"] == "CRITICAL")
 
-    summary_text = (
-        f"Analyzed {orig_w}x{orig_h} image. Identified {len(detections)} defect regions ({critical_count} critical) "
-        f"using multi-scale edge and texture variance analysis."
-        if detections else
-        f"Analyzed {orig_w}x{orig_h} image ({domain}). Image exhibits nominal surface characteristics; "
-        f"no satellite structural fractures, Kapton tears, or micro-cracks identified."
-    )
+    warning_msg = None
+    if domain == "NON_AEROSPACE_IMAGE":
+        warning_msg = "Unrelated media detected. Please upload relevant spacecraft imagery (e.g., solar panels, satellite hulls, thermal blankets, or orbital payload components) for defect inspection."
+        summary_text = (
+            f"Analyzed {orig_w}x{orig_h} non-aerospace image. No satellite structural defects identified. "
+            "Please upload relevant spacecraft imagery (such as solar array wings, MLI insulation blankets, satellite hulls, or payload optics) to perform structural anomaly detection."
+        )
+    elif detections:
+        summary_text = (
+            f"Analyzed {orig_w}x{orig_h} spacecraft image. Identified {len(detections)} defect regions ({critical_count} critical) "
+            f"using multi-scale edge and texture variance analysis."
+        )
+    else:
+        summary_text = (
+            f"Analyzed {orig_w}x{orig_h} spacecraft imagery ({domain}). Surface exhibits nominal characteristics; "
+            f"no structural fractures, Kapton tears, or micro-cracks detected."
+        )
 
     return {
         "isSimulated": False,
-        "engineVersion": "OrbitGuard-Vision-Engine v2.0 (Active)",
+        "engineVersion": "SatShield-Vision-Engine v2.0 (Active)",
         "processedAt": datetime.now(timezone.utc).isoformat(),
         "domain": domain,
+        "warning": warning_msg,
         "imageMetrics": {
             "width": orig_w,
             "height": orig_h,

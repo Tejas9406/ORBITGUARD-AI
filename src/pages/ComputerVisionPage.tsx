@@ -10,6 +10,7 @@ import {
   RotateCcw,
   ArrowRight,
   ShieldCheck,
+  AlertTriangle,
 } from 'lucide-react';
 
 export const ComputerVisionPage: React.FC = () => {
@@ -143,7 +144,7 @@ export const ComputerVisionPage: React.FC = () => {
         <div className="flex items-center gap-2.5">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
           <div>
-            <span className="text-cyan-300 font-bold">ORBITGUARD VISION INFERENCE ENGINE ONLINE: </span>
+            <span className="text-cyan-300 font-bold">SATSHIELD VISION INFERENCE ENGINE ONLINE: </span>
             <span className="text-cyan-200/90">
               Multi-scale gradient analysis, edge discontinuity mapping, and real-time defect segmentation active.
             </span>
@@ -364,6 +365,46 @@ export const ComputerVisionPage: React.FC = () => {
                       Telemetry Correlation Action
                     </span>
                     <p className="text-cyan-200 leading-relaxed">{selectedDetection.recommendation}</p>
+                  </div>
+                </div>
+              ) : analysisResult && (analysisResult.domain === 'NON_AEROSPACE_IMAGE' || analysisResult.warning) ? (
+                <div className="space-y-4 font-mono text-xs">
+                  <div className="p-4 rounded bg-amber-950/40 border border-amber-500/50 text-center animate-fade-in">
+                    <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 mx-auto flex items-center justify-center mb-2 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                      <AlertTriangle className="w-6 h-6" />
+                    </div>
+                    <span className="text-amber-300 font-bold block mb-1 text-sm uppercase">Unrelated Media Detected</span>
+                    <p className="text-slate-300 text-[11px] leading-relaxed mb-3">
+                      {analysisResult.warning || 'The uploaded media does not match spacecraft hardware or aerospace inspection parameters. Please upload relevant spacecraft imagery (e.g., solar panels, satellite hulls, thermal blankets, or orbital payload components) for defect inspection.'}
+                    </p>
+                    <div className="border-t border-amber-500/30 pt-2 text-[10px] text-amber-400/90">
+                      Recommendation: Please upload relevant spacecraft imagery or test with the preset mission samples below.
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between p-2.5 rounded bg-[#081224] border border-[#14233D]">
+                    <span className="text-slate-400">Image Classification:</span>
+                    <span className="text-amber-400 font-bold">NON_AEROSPACE_MEDIA</span>
+                  </div>
+
+                  <div className="space-y-2 pt-2">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                      Quick Spacecraft Test Samples:
+                    </span>
+                    <button
+                      onClick={() => handleLoadSample('solar_array_inspection')}
+                      className="w-full py-2 px-3 rounded bg-[#091326] border border-[#162744] hover:border-cyan-400 text-slate-200 text-xs font-mono flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Load Sample: Solar Array Panel</span>
+                    </button>
+                    <button
+                      onClick={() => handleLoadSample('thermal_blanket_delam')}
+                      className="w-full py-2 px-3 rounded bg-[#091326] border border-[#162744] hover:border-cyan-400 text-slate-200 text-xs font-mono flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                    >
+                      <ImageIcon className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Load Sample: MLI Thermal Shield</span>
+                    </button>
                   </div>
                 </div>
               ) : analysisResult && analysisResult.totalDetections === 0 ? (

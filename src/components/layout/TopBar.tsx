@@ -29,7 +29,25 @@ export const TopBar: React.FC<Props> = ({ onOpenMobileMenu }) => {
   };
 
   return <header className="h-16 bg-[#090E1B] border-b border-[#1E2D4A] px-4 md:px-6 flex items-center justify-between sticky top-0 z-30">
-    <div className="flex items-center gap-3"><button onClick={onOpenMobileMenu} className="lg:hidden p-2 text-slate-300" aria-label="Open navigation"><Menu className="w-5 h-5"/></button><div><p className="font-mono text-sm font-bold text-slate-100">SAT<span className="text-cyan-400">SHIELD</span></p><p className="text-[10px] font-mono text-slate-400">Aerospace analysis workspace</p></div></div>
+    <div className="flex items-center gap-3">
+      <button onClick={onOpenMobileMenu} className="lg:hidden p-2 text-slate-300" aria-label="Open navigation">
+        <Menu className="w-5 h-5"/>
+      </button>
+      <div className="relative flex items-center justify-center shrink-0">
+        <div className="absolute -inset-1 rounded-full bg-cyan-400/30 blur-sm animate-pulse-slow"></div>
+        <img
+          src="/logo.png"
+          alt="SATSHIELD Logo"
+          className="relative w-9 h-9 object-contain rounded-full border border-cyan-400/50 p-0.5 bg-[#060C18] shadow-[0_0_14px_rgba(0,229,255,0.6)]"
+        />
+      </div>
+      <div>
+        <p className="font-mono text-sm font-bold text-slate-100 tracking-wider">
+          SAT<span className="text-cyan-400">SHIELD</span>
+        </p>
+        <p className="text-[10px] font-mono text-slate-400">Aerospace analysis workspace</p>
+      </div>
+    </div>
     <div className="flex items-center gap-3 text-xs font-mono">
         <span className="hidden sm:flex items-center gap-1.5 text-cyan-300"><Database className="w-3.5 h-3.5"/>
             <select className="bg-[#080E1C] border border-[#1E2D4A] text-cyan-300 rounded focus:outline-none ml-1 px-1 py-0.5" value={current} onChange={handleDatasetChange}>

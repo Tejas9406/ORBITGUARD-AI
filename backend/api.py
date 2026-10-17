@@ -94,7 +94,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="SatShield & OrbitGuard AI API",
+    title="SatShield API",
     description="Integrated Multi-Model Consensus Telemetry Anomaly Detection & Spacecraft Fleet Intelligence Engine",
     version="1.0.0",
     lifespan=lifespan
@@ -122,19 +122,19 @@ app.add_middleware(
 def health_check():
     return {
         "status": "ok",
-        "service": "SatShield & OrbitGuard AI Multi-Model Detection Engine",
+        "service": "SatShield Multi-Model Detection Engine",
         "version": "1.0.0",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
-# ----------------- OrbitGuard Multi-Model Dataset Endpoints -----------------
+# ----------------- SatShield Multi-Model Dataset Endpoints -----------------
 
-@app.get("/api/v1/datasets", tags=["OrbitGuard Datasets"])
+@app.get("/api/v1/datasets", tags=["SatShield Datasets"])
 def get_datasets():
     populate_datasets()
     return list(DATASETS_CACHE.values())
 
-@app.post("/api/v1/datasets/upload", tags=["OrbitGuard Datasets"])
+@app.post("/api/v1/datasets/upload", tags=["SatShield Datasets"])
 async def upload_dataset(file: UploadFile = File(...)):
     import pandas as pd
     import numpy as np
@@ -294,7 +294,7 @@ async def upload_dataset(file: UploadFile = File(...)):
         "total_anomalies": total_anomalies
     }
 
-@app.get("/api/v1/datasets/{dataset_id}/channels", tags=["OrbitGuard Datasets"])
+@app.get("/api/v1/datasets/{dataset_id}/channels", tags=["SatShield Datasets"])
 def get_dataset_channels(dataset_id: str):
     channels = []
     if dataset_id == "testing-dataset":
@@ -511,7 +511,7 @@ def get_dataset_channels(dataset_id: str):
     return channels
 
 
-@app.get("/api/v1/datasets/{dataset_id}/telemetry", tags=["OrbitGuard Datasets"])
+@app.get("/api/v1/datasets/{dataset_id}/telemetry", tags=["SatShield Datasets"])
 def get_telemetry_series(
     dataset_id: str,
     channel: str,
@@ -734,13 +734,13 @@ async def vision_analyze(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Image processing failed: {str(e)}")
 
-# ----------------- OrbitGuard Multi-Model Analysis -----------------
+# ----------------- SatShield Multi-Model Analysis -----------------
 
 class RunAnalysisRequest(BaseModel):
     dataset_id: str
     channel: str
 
-@app.post("/api/v1/analysis/run", tags=["OrbitGuard Analysis"])
+@app.post("/api/v1/analysis/run", tags=["SatShield Analysis"])
 def run_analysis(req: RunAnalysisRequest):
     pipeline = OrbitGuardPipeline()
     try:
@@ -821,7 +821,7 @@ def run_analysis(req: RunAnalysisRequest):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/v1/analysis/{run_id}/events", tags=["OrbitGuard Analysis"])
+@app.get("/api/v1/analysis/{run_id}/events", tags=["SatShield Analysis"])
 def get_run_events(run_id: str):
     if run_id not in RUNS_CACHE:
         return []
@@ -887,7 +887,7 @@ def get_run_events(run_id: str):
 
     return events
 
-@app.get("/api/v1/analysis/{run_id}/health", tags=["OrbitGuard Analysis"])
+@app.get("/api/v1/analysis/{run_id}/health", tags=["SatShield Analysis"])
 def get_run_health(run_id: str):
     if run_id not in RUNS_CACHE:
         raise HTTPException(status_code=404, detail="Run not found")
@@ -907,7 +907,7 @@ def get_run_health(run_id: str):
         "health_indicator": score
     }
 
-@app.get("/api/v1/history", tags=["OrbitGuard History"])
+@app.get("/api/v1/history", tags=["SatShield History"])
 def get_history():
     runs = history.get_latest_runs(limit=100)
     history_list = []
